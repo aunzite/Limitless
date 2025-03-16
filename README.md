@@ -4,11 +4,11 @@ Thank you for taking intrest in our game! We hope to hear some feedback and any 
 ## About the game
 
 
-## Credits
-Coders: Aun, Ajmal <br>
-Art: Ajmal, Aun <br>
+## Credits (so far)
+Coders: Aun <br>
+Art: Aun <br>
 Story: Ahmed, Aun, Ajmal <br>
-Testing: -- <br>
+Testing: Aun <br>
 Presentation Expert: -- <br>
 
 
