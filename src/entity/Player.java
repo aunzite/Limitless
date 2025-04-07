@@ -21,8 +21,8 @@ public class Player extends Entity{
     }
     public void setDefaultValues (){
 
-        x = 100;
-        y = 100;
+        x = gp.screenWidth/2 - (gp.tileSize/2); // Center the player on the screen
+        y = gp.screenHeight/2 - (gp.tileSize/2); // Center the player on the screen
         speed = 2;
         direction = "down";
     }
@@ -113,6 +113,12 @@ public class Player extends Entity{
             if(keyH.rightPressed == true){
                 direction = "right";
                 x += speed;
+            }
+            if (keyH.shiftPressed == true){
+                speed = 4;
+            }
+            else{
+                speed = 2;
             }
     
             spriteCounter++;

@@ -2,8 +2,9 @@ package main; // Package declaration
 
 //imports
 import entity.Player;
-import java.awt.*; // Import AWT classes
-import javax.swing.JPanel; // Import JPanel class
+import java.awt.*;
+import javax.swing.JPanel; // Import AWT classes
+import tile.TileManager; // Import JPanel class
 
 public class GamePanel extends JPanel implements Runnable{ // GamePanel class extending JPanel and implementing Runnable
 
@@ -14,11 +15,13 @@ public class GamePanel extends JPanel implements Runnable{ // GamePanel class ex
     public final int tileSize = originalTileSize * scale; // 48x48 tile
     final int maxScreenCol = 16; // Maximum number of columns on the screen
     final int maxScreenRow = 12; // Maximum number of rows on the screen
-    final int screenWidth = tileSize * maxScreenCol; // 768 pixels
-    final int screenHeight = tileSize * maxScreenRow; // 576 pixels
+    public final int screenWidth = tileSize * maxScreenCol; // 768 pixels
+    public final int screenHeight = tileSize * maxScreenRow; // 576 pixels
 
     //FPS (Frames Per Second)
     int FPS = 60; // Frames per second
+
+    TileManager tileM = new TileManager(this);
 
     // KeyHandler instance to handle keyboard input
     KeyHandler keyH = new KeyHandler(); // Create a KeyHandler object
@@ -87,6 +90,8 @@ public class GamePanel extends JPanel implements Runnable{ // GamePanel class ex
         super.paintComponent(g); // Call superclass method
         Graphics2D g2 = (Graphics2D) g; // Cast Graphics to Graphics2D
 
+        tileM.draw(g2); // Draw the tiles
+        
         player.draw(g2); // Draw the player
 
         g2.dispose(); // Dispose of the graphics context
