@@ -8,50 +8,65 @@ import javax.imageio.ImageIO;
 import main.GamePanel;
 import main.KeyHandler;
 
+// Player class representing the main character in the game
+// Extends the Entity class to inherit basic entity properties
 public class Player extends Entity{
-    GamePanel gp;
-    KeyHandler keyH;
+    GamePanel gp;       // Reference to the GamePanel instance
+    KeyHandler keyH;    // Handles keyboard input
 
-    public final int screenX; // Player's x position on the screen
-    public final int screenY; // Player's y position on the screen
+    // Screen position constants (center of screen)
+    public final int screenX; // Fixed X position on screen
+    public final int screenY; // Fixed Y position on screen
 
+    // Constructor initializes player with game panel and keyboard handler
     public Player (GamePanel gp, KeyHandler keyH){
         this.gp = gp;
         this.keyH = keyH;
 
+        // Calculate center position of screen for player
         screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
         screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
 
         setDefaultValues();
         getPlayerImage();
     }
+
+    // Sets default values for player position and movement
     public void setDefaultValues (){
 
+        // Set initial world position to center of the map
         worldX = gp.tileSize*14 - gp.tileSize/2;
         worldY = gp.tileSize*14 - gp.tileSize/2;
-        speed = 2;
-        direction = "down";
+        speed = 2;              // Default movement speed
+        direction = "down";     // Default facing direction
     }
+
+    //Extracts a single sprite from the sprite sheet
     private BufferedImage getSprite(String sheetPath, int row, int col, int spriteWidth, int spriteHeight) {
         try {
             BufferedImage spriteSheet = ImageIO.read(new File(sheetPath));
+
+            // Calculate position in sprite sheet with spacing and offset
             return spriteSheet.getSubimage(
-                (col * spriteWidth + 9) + (col*25),  // x coordinate
-                (row * spriteHeight + 14) + (row*13), // y coordinate
-                spriteWidth,        // sprite width
-                spriteHeight        // sprite height
+                (col * spriteWidth + 9) + (col*25),  // x coordinate with offset and spacing
+                (row * spriteHeight + 14) + (row*13), // y coordinate with offset and spacing
+                spriteWidth,        // width of single sprite
+                spriteHeight        // height of single sprite
             );
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
     }
-    
+
+    // Loads all player sprites from the sprite sheet
     public void getPlayerImage() {
         try {
-            String spriteSheetPath = "res/player/walk.png";
-            int spriteWidth = 39;  // adjust based on your sprite size
-            int spriteHeight = 50; // adjust based on your sprite size
+            
+            // Sprite sheet configuration
+            String spriteSheetPath = "res/player/walk.png"; // Path to the sprite sheet
+            int spriteWidth = 39;  // Width of each sprite frame
+            int spriteHeight = 50; // Height of each sprite frame
             
             // Example: Load sprites from specific rows and columns
             // Parameters: (sheetPath, row, column, width, height)
@@ -100,10 +115,13 @@ public class Player extends Entity{
         }
     }
     
+    // Updates player position and animation state based on input
     public void update(){
 
+        // Only update if movement keys are pressed
         if(keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true || keyH.rightPressed == true){
             
+            // Update direction and position based on key input
             if(keyH.upPressed == true){
                 direction = "up";
                 worldY -= speed;
@@ -120,15 +138,20 @@ public class Player extends Entity{
                 direction = "right";
                 worldX += speed;
             }
+
+            // Handle sprint speed
             if (keyH.shiftPressed == true){
-                speed = 4;
+                speed = 4;           // Sprint speed
             }
             else{
-                speed = 2;
+                speed = 2;          // Normal speed
             }
     
+            // Animation handling
             spriteCounter++;
-            if(spriteCounter > 12){
+            if(spriteCounter > 12){     // Animation speed control
+
+                // Cycle through sprite frames
                 switch (spriteNum){
                     case 1 -> spriteNum = 2;
                     case 2 -> spriteNum = 3;
@@ -140,16 +163,17 @@ public class Player extends Entity{
                     case 8 -> spriteNum = 9;
                     case 9 -> spriteNum = 1;
                 }
+                
                 spriteCounter = 0;
             }
         }
     }
     
+    // Draws the player with current sprite based on direction and animation frame
     public void draw(Graphics2D g2){
-        
-
         BufferedImage image = null;
         
+        // Select correct sprite based on direction and animation frame
         switch(direction){
             case "up" -> {
                 switch (spriteNum){
@@ -209,6 +233,7 @@ public class Player extends Entity{
 
         }
         
+        // Draw the player sprite at screen position
         g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
     }
 }
