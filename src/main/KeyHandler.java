@@ -1,57 +1,57 @@
-package main; // Package declaration
+package main;
 
-import java.awt.event.KeyEvent; // Import KeyEvent class
-import java.awt.event.KeyListener; // Import KeyListener interface
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
-public class KeyHandler implements KeyListener{ // KeyHandler class implementing KeyListener
-
-    public boolean shiftPressed, upPressed, downPressed, leftPressed, rightPressed; // Booleans to track key presses
+// Handles keyboard input for the game by implementing KeyListener interface
+// Tracks the state of movement keys (WASD) and modifier keys (Shift)
+public class KeyHandler implements KeyListener {
+    
+    // Movement state tracking variables
+    public boolean shiftPressed;  // Sprint modifier key state
+    public boolean upPressed;     // W key state for upward movement
+    public boolean downPressed;   // S key state for downward movement
+    public boolean leftPressed;   // A key state for left movement
+    public boolean rightPressed;  // D key state for right movement
     
     @Override
-    public void keyTyped(KeyEvent e) { // Method called when a key is typed (not used)
+    // Required by KeyListener interface but unused in this implementation
+    // Called when a key is typed (pressed and released)
+    public void keyTyped(KeyEvent e) {
+        // Not used in current implementation
     }
 
     @Override
-    public void keyPressed(KeyEvent e) { // Method called when a key is pressed
-        int code = e.getKeyCode(); // Get the key code of the pressed key
+    // Handles key press events and updates movement flags
+    // Sets the corresponding movement flag to true when a key is pressed
+    public void keyPressed(KeyEvent e) {
+        // Get the numerical code of the pressed key
+        int code = e.getKeyCode();
         
-        if (code == KeyEvent.VK_W){ // If 'W' key is pressed
-            upPressed = true; // Set upPressed to true
-        }
-        if (code == KeyEvent.VK_S){ // If 'S' key is pressed
-            downPressed = true; // Set downPressed to true
-        }
-        if (code == KeyEvent.VK_A){ // If 'A' key is pressed
-            leftPressed = true; // Set leftPressed to true
-        }
-        if (code == KeyEvent.VK_D){ // If 'D' key is pressed
-            rightPressed = true; // Set rightPressed to true
-        }
-        if (code == KeyEvent.VK_SHIFT){ // If 'Shift' key is pressed
-            shiftPressed = true; // Set shiftPressed to true
+        // Update movement flags based on WASD keys and Shift
+        switch(code) {
+            case KeyEvent.VK_W -> upPressed = true;     // Enable up movement
+            case KeyEvent.VK_S -> downPressed = true;   // Enable down movement
+            case KeyEvent.VK_A -> leftPressed = true;   // Enable left movement
+            case KeyEvent.VK_D -> rightPressed = true;  // Enable right movement
+            case KeyEvent.VK_SHIFT -> shiftPressed = true;  // Enable sprint modifier
         }
     }
 
     @Override
-    public void keyReleased(KeyEvent e) { // Method called when a key is released
-
-        int code = e.getKeyCode(); // Get the key code of the released key
-
-        if (code == KeyEvent.VK_W){ // If 'W' key is released
-            upPressed = false; // Set upPressed to false
-        }
-        if (code == KeyEvent.VK_S){ // If 'S' key is released
-            downPressed = false; // Set downPressed to false
-        }
-        if (code == KeyEvent.VK_A){ // If 'A' key is released
-            leftPressed = false; // Set leftPressed to false
-        }
-        if (code == KeyEvent.VK_D){ // If 'D' key is released
-            rightPressed = false; // Set rightPressed to false
-        }
-        if (code == KeyEvent.VK_SHIFT){ //If 'Shift' key is released
-            shiftPressed = false; // Set shiftPressed to false
+    // Handles key release events and updates movement flags
+    // Sets the corresponding movement flag to false when a key is released
+    public void keyReleased(KeyEvent e) {
+        // Get the numerical code of the released key
+        int code = e.getKeyCode();
+        
+        // Reset movement flags based on WASD keys and Shift
+        switch(code) {
+            case KeyEvent.VK_W -> upPressed = false;     // Disable up movement
+            case KeyEvent.VK_S -> downPressed = false;   // Disable down movement
+            case KeyEvent.VK_A -> leftPressed = false;   // Disable left movement
+            case KeyEvent.VK_D -> rightPressed = false;  // Disable right movement
+            case KeyEvent.VK_SHIFT -> shiftPressed = false;  // Disable sprint modifier
         }
     }
-
 }

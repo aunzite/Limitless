@@ -1,105 +1,101 @@
-package main; // Package declaration
+package main;
 
-//imports
 import entity.Player;
 import java.awt.*;
-import javax.swing.JPanel; // Import AWT classes
-import tile.TileManager; // Import JPanel class
+import javax.swing.JPanel;
+import tile.TileManager;
 
-public class GamePanel extends JPanel implements Runnable{ // GamePanel class extending JPanel and implementing Runnable
+// Main game panel class that handles the game loop, rendering and updates
+// Extends JPanel for GUI functionality and implements Runnable for the game loop
+public class GamePanel extends JPanel implements Runnable {
 
-    //Screen settings
-    final int originalTileSize = 16; // 16x16 tile (character size)
-    final int scale = 3; // Scale factor
+    // Screen Settings
+    final int originalTileSize = 16;                         // Original tile size (16x16 pixels)
+    final int scale = 3;                                     // Scale factor for modern displays
+    public final int tileSize = originalTileSize * scale;    // Actual tile size used in game (48x48)
+    public final int maxScreenCol = 16;                      // Number of columns that fit on screen
+    public final int maxScreenRow = 12;                      // Number of rows that fit on screen
+    public final int screenWidth = tileSize * maxScreenCol;  // Total screen width in pixels
+    public final int screenHeight = tileSize * maxScreenRow; // Total screen height in pixels
 
-    public final int tileSize = originalTileSize * scale; // 48x48 tile
-    public final int maxScreenCol = 16; // Maximum number of columns on the screen
-    public final int maxScreenRow = 12; // Maximum number of rows on the screen
-    public final int screenWidth = tileSize * maxScreenCol; // 768 pixels
-    public final int screenHeight = tileSize * maxScreenRow; // 576 pixels
+    // World Settings
+    public final int maxWorldCol = 28;                       // Total number of columns in world map
+    public final int maxWorldRow = 28;                       // Total number of rows in world map
+    public final int worldWidth = tileSize * maxWorldCol;    // Total world width in pixels
+    public final int worldHeight = tileSize * maxWorldRow;   // Total world height in pixels
 
-    //WWORLD SETTINGS
-    public final int maxWorldCol = 28;
-    public final int maxWorldRow = 28;
-    public final int worldWidth = tileSize * maxWorldCol; // 768 pixels
-    public final int worldHeight = tileSize * maxWorldRow; // 576 pixels
+    // Game Components
+    private final int FPS = 60;                     // Target frames per second
+    TileManager tileM = new TileManager(this);      // Manages the game's tiles/map
+    KeyHandler keyH = new KeyHandler();             // Handles keyboard input
+    Thread gameThread;                              // Main game loop thread
+    public Player player = new Player(this, keyH);  // Player entity
 
-    //FPS (Frames Per Second)
-    int FPS = 60; // Frames per second
-
-    TileManager tileM = new TileManager(this);
-
-    // KeyHandler instance to handle keyboard input
-    KeyHandler keyH = new KeyHandler(); // Create a KeyHandler object
-    // Thread for the game loop
-    Thread gameThread; // Declare a Thread object
-    public Player player = new Player(this, keyH); // Create a Player object
-
-    // Constructor to set up the game panel
+    // Constructor: Initializes the game panel and sets up basic properties
     public GamePanel() {
-        this.setPreferredSize(new Dimension(screenWidth, screenHeight)); // Set the size of the panel
-        this.setBackground(Color.BLACK); // Set the background color to black
-        this.setDoubleBuffered(true); // Enable double buffering for smoother rendering
-        this.addKeyListener(keyH); // Add the key listener for keyboard input
-        this.setFocusable(true); // Make the panel focusable to receive key events
+        this.setPreferredSize(new Dimension(screenWidth, screenHeight));
+        this.setBackground(Color.BLACK);
+        this.setDoubleBuffered(true);     // Enables double buffering for smooth graphics
+        this.addKeyListener(keyH);              // Enable keyboard input
+        this.setFocusable(true);      // Allow panel to receive input focus
     }
 
-    // Method to start the game thread
-    public void startGameThread(){
-        gameThread = new Thread(this); // Create a new thread
-        gameThread.start(); // Start the thread
+    // Starts the game thread and begins the game loop
+    public void startGameThread() {
+        gameThread = new Thread(this);
+        gameThread.start();
     }
 
     @Override
-    // Game loop
-    public void run(){
+    // Main game loop implementation
+    // Handles timing, updates, and rendering at a fixed rate (60 FPS)
+    public void run() {
+        double drawInterval = 1000000000/FPS;  // Time per frame in nanoseconds
+        double delta = 0;
+        long lastTime = System.nanoTime();
+        long currentTime;
+        long timer = 0;
+        int drawCount = 0;
 
-        double drawInterval = 1000000000 / FPS; // 0.01666 seconds per frame
-        double delta = 0; // Time difference accumulator
-        long lastTime = System.nanoTime(); // Last time in nanoseconds
-        long currentTime; // Current time in nanoseconds
-        long timer = 0; // Timer for FPS calculation
-        int drawCount = 0; // Frame counter
+        // Game loop
+        while(gameThread != null) {
+            currentTime = System.nanoTime();
+            
+            // Accumulate time since last update
+            delta += (currentTime - lastTime) / drawInterval;
+            timer += (currentTime - lastTime);
+            lastTime = currentTime;
 
-        // Main game loop
-        while (gameThread != null){
-
-            currentTime = System.nanoTime(); // Get current time
-
-            delta += (currentTime - lastTime) / drawInterval; // Calculate time difference
-            timer += (currentTime - lastTime); // Add to timer
-            lastTime = currentTime; // Update last time
-
-            if (delta >= 1){
-                update(); // Update game state
-                repaint(); // Render the game
-                delta--; // Decrease delta
-                drawCount++; // Increment frame counter
+            // Update and render when enough time has passed
+            if(delta >= 1) {
+                update();    // Update game state
+                repaint();   // Trigger paintComponent
+                delta--;     // Reset time accumulator
+                drawCount++;
             }
-            if (timer >= 1000000000){
-                System.out.println("FPS: " + drawCount); // Print FPS to console
-                drawCount = 0; // Reset frame counter
-                timer = 0; // Reset timer
+
+            // Display FPS counter every second
+            if(timer >= 1000000000) {
+                System.out.println("FPS: " + drawCount);
+                drawCount = 0;
+                timer = 0;
             }
         }
     }
 
-    // Method to update the game state
-    public void update(){
-        
-        player.update(); // Update player position
+    // Updates game state (called every frame)
+    public void update() {
+        player.update();    // Update player position and state
     }
 
-    // Method to render the game
-    public void paintComponent(Graphics g){
-
-        super.paintComponent(g); // Call superclass method
-        Graphics2D g2 = (Graphics2D) g; // Cast Graphics to Graphics2D
-
-        tileM.draw(g2); // Draw the tiles
-        
-        player.draw(g2); // Draw the player
-
-        g2.dispose(); // Dispose of the graphics context
+    // Renders the game (called every frame)
+    // Order of drawing determines layer visibility
+    @Override
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D)g;    // Use Graphics2D for better rendering control
+        tileM.draw(g2);     // Draw background tiles first
+        player.draw(g2);    // Draw player on top of tiles
+        g2.dispose();       // Clean up graphics resources
     }
 }

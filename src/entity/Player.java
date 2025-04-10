@@ -10,7 +10,7 @@ import main.KeyHandler;
 
 // Player class representing the main character in the game
 // Extends the Entity class to inherit basic entity properties
-public class Player extends Entity{
+public final class Player extends Entity{
     GamePanel gp;       // Reference to the GamePanel instance
     KeyHandler keyH;    // Handles keyboard input
 
@@ -54,8 +54,7 @@ public class Player extends Entity{
                 spriteHeight        // height of single sprite
             );
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            return null;         // Return null if error occurs
         }
     }
 
@@ -110,9 +109,7 @@ public class Player extends Entity{
             right8 = getSprite(spriteSheetPath, 3, 7, spriteWidth, spriteHeight);    // Fourth row, eighth column
             right9 = getSprite(spriteSheetPath, 3, 8, spriteWidth, spriteHeight);    // Fourth row, ninth column
             
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        } catch (Exception e) {}
     }
     
     // Updates player position and animation state based on input
@@ -163,7 +160,7 @@ public class Player extends Entity{
                     case 8 -> spriteNum = 9;
                     case 9 -> spriteNum = 1;
                 }
-                
+
                 spriteCounter = 0;
             }
         }
