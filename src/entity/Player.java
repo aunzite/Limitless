@@ -12,17 +12,23 @@ public class Player extends Entity{
     GamePanel gp;
     KeyHandler keyH;
 
+    public final int screenX; // Player's x position on the screen
+    public final int screenY; // Player's y position on the screen
+
     public Player (GamePanel gp, KeyHandler keyH){
         this.gp = gp;
         this.keyH = keyH;
+
+        screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
+        screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
 
         setDefaultValues();
         getPlayerImage();
     }
     public void setDefaultValues (){
 
-        x = gp.screenWidth/2 - (gp.tileSize/2); // Center the player on the screen
-        y = gp.screenHeight/2 - (gp.tileSize/2); // Center the player on the screen
+        worldX = gp.tileSize*14 - gp.tileSize/2;
+        worldY = gp.tileSize*14 - gp.tileSize/2;
         speed = 2;
         direction = "down";
     }
@@ -100,19 +106,19 @@ public class Player extends Entity{
             
             if(keyH.upPressed == true){
                 direction = "up";
-                y -= speed;
+                worldY -= speed;
             }
             if(keyH.downPressed == true){
                 direction = "down";
-                y += speed;
+                worldY += speed;
             }
             if(keyH.leftPressed == true){
                 direction = "left";
-                x -= speed;
+                worldX -= speed;
             }
             if(keyH.rightPressed == true){
                 direction = "right";
-                x += speed;
+                worldX += speed;
             }
             if (keyH.shiftPressed == true){
                 speed = 4;
@@ -143,6 +149,7 @@ public class Player extends Entity{
         
 
         BufferedImage image = null;
+        
         switch(direction){
             case "up" -> {
                 switch (spriteNum){
@@ -201,6 +208,7 @@ public class Player extends Entity{
             }
 
         }
-        g2.drawImage(image, x, y, gp.tileSize, gp.tileSize, null);
+        
+        g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
     }
 }
