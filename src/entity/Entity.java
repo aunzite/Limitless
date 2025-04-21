@@ -1,7 +1,18 @@
+/////////////////////////////////////////////////////////////////////////////
+// Limitless
+// Entity.java
+// 
+// Description: Base class for all game entities. This class:
+// - Defines core entity properties and states (Aun)
+// - Manages entity positioning and movement (Aun)
+// - Handles sprite animation framework (Aun)
+// - Provides common entity functionality (Aun)
+// - Controls directional state management (Aun)
+/////////////////////////////////////////////////////////////////////////////
+
 package entity;
 
 import java.awt.image.BufferedImage;
-
 
 // Base class for all game entities (players, NPCs, etc.)
 

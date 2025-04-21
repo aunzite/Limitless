@@ -1,3 +1,14 @@
+/////////////////////////////////////////////////////////////////////////////
+// Limitless
+// Main.java
+// 
+// Description: Main entry point for the game. This class:
+// - Creates and configures the game window (Aun)
+// - Sets up the main game panel (Aun)
+// - Initializes display settings (Aun)
+// - Launches the game thread (Aun)
+/////////////////////////////////////////////////////////////////////////////
+
 package main;
 
 import javax.swing.JFrame;

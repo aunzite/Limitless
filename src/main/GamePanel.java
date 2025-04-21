@@ -1,3 +1,15 @@
+/////////////////////////////////////////////////////////////////////////////
+// Limitless
+// GamePanel.java
+// 
+// Description: Main game panel that handles core game functionality. This class:
+// - Manages the game loop and timing system (Aun)
+// - Handles screen and world settings (Aun)
+// - Controls rendering pipeline and layers (Aun)
+// - Coordinates player and tile updates (Aun)
+// - Manages input processing and game state (Aun)
+/////////////////////////////////////////////////////////////////////////////
+
 package main;
 
 import entity.Player;

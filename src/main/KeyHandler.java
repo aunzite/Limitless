@@ -1,3 +1,14 @@
+/////////////////////////////////////////////////////////////////////////////
+// Limitless
+// KeyHandler.java
+// 
+// Description: Keyboard input handler for the game. This class:
+// - Implements KeyListener interface for input handling (Aun)
+// - Tracks WASD movement key states (Aun)
+// - Manages sprint modifier with shift key (Aun)
+// - Updates movement flags based on key events (Aun)
+/////////////////////////////////////////////////////////////////////////////
+
 package main;
 
 import java.awt.event.KeyEvent;

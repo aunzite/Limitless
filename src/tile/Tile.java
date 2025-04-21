@@ -1,3 +1,14 @@
+/////////////////////////////////////////////////////////////////////////////
+// Limitless
+// Tile.java
+// 
+// Description: Base tile class for the game's world. This class:
+// - Represents individual map tiles (Aun)
+// - Manages tile properties and collision states (Aun)
+// - Handles tile image loading and storage (Aun)
+// - Provides basic tile functionality (Aun)
+/////////////////////////////////////////////////////////////////////////////
+
 package tile;
 
 import java.awt.image.BufferedImage;

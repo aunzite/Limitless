@@ -1,3 +1,15 @@
+/////////////////////////////////////////////////////////////////////////////
+// Limitless
+// TileManager.java
+// 
+// Description: Manages the game's tile system and map rendering. This class:
+// - Loads and manages tile resources (Aun)
+// - Handles map file loading and parsing (Aun)
+// - Controls tile rendering and visibility (Aun)
+// - Manages camera-based tile culling (Aun)
+// - Coordinates world-to-screen conversions (Aun)
+/////////////////////////////////////////////////////////////////////////////
+
 package tile;
 
 import java.awt.Graphics2D;

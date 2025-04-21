@@ -1,3 +1,15 @@
+/////////////////////////////////////////////////////////////////////////////
+// Limitless
+// Player.java
+// 
+// Description: Main player character class. This class:
+// - Handles player movement and controls (Aun)
+// - Manages sprite animations and rendering (Aun)
+// - Controls player position and camera centering (Aun)
+// - Processes keyboard input for movement (Aun)
+// - Implements sprinting mechanics (Aun)
+/////////////////////////////////////////////////////////////////////////////
+
 package entity;
 
 import java.awt.Graphics2D;
