@@ -20,8 +20,8 @@ import main.GamePanel;
 // Manages the game's tile system, including loading and rendering tiles
 public final class TileManager {
     GamePanel gp;           // Reference to the main game panel
-    Tile[] tile;           // Array to store different types of tiles
-    int mapTileNum[][];    // 2D array storing the map layout
+    public Tile[] tile;           // Array to store different types of tiles
+    public int mapTileNum[][];    // 2D array storing the map layout
 
     // Constructor initializes tile system and loads resources
     public TileManager (GamePanel gp) {
@@ -48,6 +48,7 @@ public final class TileManager {
             // Index 2: Water
             tile[2] = new Tile();
             tile[2].image = ImageIO.read(new File("res/tiles/water.png"));
+            tile[2].collision = true; //Collsion added to this texutre.
 
         } catch (IOException e) {}
     }

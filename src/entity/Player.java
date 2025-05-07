@@ -13,6 +13,7 @@
 package entity;
 
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +39,8 @@ public final class Player extends Entity{
         // Calculate center position of screen for player
         screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
         screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
+
+        playerHitbox = new Rectangle(8, 16,32, 32);
 
         setDefaultValues();
         getPlayerImage();
@@ -133,19 +136,27 @@ public final class Player extends Entity{
             // Update direction and position based on key input
             if(keyH.upPressed == true){
                 direction = "up";
-                worldY -= speed;
             }
             if(keyH.downPressed == true){
                 direction = "down";
-                worldY += speed;
             }
             if(keyH.leftPressed == true){
                 direction = "left";
-                worldX -= speed;
             }
             if(keyH.rightPressed == true){
                 direction = "right";
-                worldX += speed;
+            }
+
+            collisionOn = false; //Check tile collision
+            gp.cCheck.checkTile(this);
+
+            if (collisionOn == false) {
+                switch(direction) {
+                    case "up" -> worldY -= speed;
+                    case "down" -> worldY += speed;
+                    case "left" -> worldX -= speed;
+                    case "right" -> worldX += speed;
+                }
             }
 
             // Handle sprint speed

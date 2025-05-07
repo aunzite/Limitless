@@ -12,6 +12,7 @@
 
 package entity;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 // Base class for all game entities (players, NPCs, etc.)
@@ -36,4 +37,7 @@ public class Entity {
     // Animation variables
     public int spriteCounter = 0;    // Controls animation timing
     public int spriteNum = 1;        // Current sprite frame number (1-9)
+
+    public Rectangle playerHitbox;
+    public boolean collisionOn = false; 
 }
