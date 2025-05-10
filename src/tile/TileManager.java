@@ -50,6 +50,11 @@ public final class TileManager {
             tile[2].image = ImageIO.read(new File("res/tiles/water.png"));
             tile[2].collision = true; //Collsion added to this texutre.
 
+            // Index 3: Tree
+            tile[3] = new Tile();
+            tile[3].image = ImageIO.read(new File("res/tiles/tree.png"));
+            tile[3].collision = true; //Collsion added to this texutre.
+
         } catch (IOException e) {}
     }
 
