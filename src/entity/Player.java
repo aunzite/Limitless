@@ -39,6 +39,7 @@ public final class Player extends Entity{
         // Calculate center position of screen for player
         screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
         screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
+       
 
         playerHitbox = new Rectangle(8, 16,32, 32);
 
@@ -50,8 +51,10 @@ public final class Player extends Entity{
     public void setDefaultValues (){
 
         // Set initial world position to center of the map
-        worldX = gp.tileSize*14 - gp.tileSize/2;
-        worldY = gp.tileSize*14 - gp.tileSize/2;
+        // worldX = gp.tileSize*14 - gp.tileSize/2;
+        // worldY = gp.tileSize*14 - gp.tileSize/2;
+        worldX = gp.tileSize*12;
+        worldY = gp.tileSize*10;
         speed = 2;              // Default movement speed
         direction = "down";     // Default facing direction
     }

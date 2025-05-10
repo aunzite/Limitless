@@ -23,7 +23,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     // Screen Settings
     final int originalTileSize = 16;                         // Original tile size (16x16 pixels)
-    final int scale = 3;                                     // Scale factor for modern displays
+    final int scale = 4;                                     // Scale factor for modern displays
     public final int tileSize = originalTileSize * scale;    // Actual tile size used in game (48x48)
     public final int maxScreenCol = 16;                      // Number of columns that fit on screen
     public final int maxScreenRow = 12;                      // Number of rows that fit on screen
@@ -31,8 +31,8 @@ public class GamePanel extends JPanel implements Runnable {
     public final int screenHeight = tileSize * maxScreenRow; // Total screen height in pixels
 
     // World Settings
-    public final int maxWorldCol = 28;                       // Total number of columns in world map
-    public final int maxWorldRow = 28;                       // Total number of rows in world map
+    public final int maxWorldCol = 69;                       // Total number of columns in world map
+    public final int maxWorldRow = 35;                       // Total number of rows in world map
     public final int worldWidth = tileSize * maxWorldCol;    // Total world width in pixels
     public final int worldHeight = tileSize * maxWorldRow;   // Total world height in pixels
 

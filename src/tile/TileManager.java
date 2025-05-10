@@ -8,6 +8,7 @@
 // - Controls tile rendering and visibility (Aun)
 // - Manages camera-based tile culling (Aun)
 // - Coordinates world-to-screen conversions (Aun)
+// - Implements tile collision properties (Ajmal)
 /////////////////////////////////////////////////////////////////////////////
 
 package tile;
@@ -54,6 +55,11 @@ public final class TileManager {
             tile[3] = new Tile();
             tile[3].image = ImageIO.read(new File("res/tiles/tree.png"));
             tile[3].collision = true; //Collsion added to this texutre.
+
+            // Index 3: Ruin
+            tile[4] = new Tile();
+            tile[4].image = ImageIO.read(new File("res/tiles/ruin.png"));
+            tile[4].collision = true; //Collsion added to this texutre.
 
         } catch (IOException e) {}
     }
