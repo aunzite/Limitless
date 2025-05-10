@@ -32,7 +32,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     // World Settings
     public final int maxWorldCol = 69;                       // Total number of columns in world map
-    public final int maxWorldRow = 35;                       // Total number of rows in world map
+    public final int maxWorldRow = 39;                       // Total number of rows in world map
     public final int worldWidth = tileSize * maxWorldCol;    // Total world width in pixels
     public final int worldHeight = tileSize * maxWorldRow;   // Total world height in pixels
 

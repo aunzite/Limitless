@@ -164,7 +164,7 @@ public final class Player extends Entity{
 
             // Handle sprint speed
             if (keyH.shiftPressed == true){
-                speed = 4;           // Sprint speed
+                speed = 10;           // Sprint speed
             }
             else{
                 speed = 2;          // Normal speed
