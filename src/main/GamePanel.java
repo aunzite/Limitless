@@ -12,10 +12,12 @@
 
 package main;
 
+import entity.HUD;
 import entity.Player;
 import java.awt.*;
 import javax.swing.JPanel;
 import tile.TileManager;
+import entity.Dialogue;
 
 // Main game panel class that handles the game loop, rendering and updates
 // Extends JPanel for GUI functionality and implements Runnable for the game loop
@@ -44,6 +46,9 @@ public class GamePanel extends JPanel implements Runnable {
     public CollisionChecker cCheck = new CollisionChecker(this);
     public Player player = new Player(this, keyH);  // Player entity
 
+    public HUD hud = new HUD(); // HUD object (Ahmed)
+    public Dialogue dialogue = new Dialogue();  // Handles NPC or story text (Ahmed)
+
     // Constructor: Initializes the game panel and sets up basic properties
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -51,6 +56,9 @@ public class GamePanel extends JPanel implements Runnable {
         this.setDoubleBuffered(true);     // Enables double buffering for smooth graphics
         this.addKeyListener(keyH);              // Enable keyboard input
         this.setFocusable(true);      // Allow panel to receive input focus
+
+        dialogue.setLine("Welcome to the village!");
+
     }
 
     // Starts the game thread and begins the game loop
@@ -99,6 +107,12 @@ public class GamePanel extends JPanel implements Runnable {
     // Updates game state (called every frame)
     public void update() {
         player.update();    // Update player position and state
+        
+        // (Ahmed) If Enter is pressed and there's dialogue, clear it
+        if (keyH.enterPressed && !dialogue.getLine().equals("")) {
+        dialogue.clear();
+        keyH.enterPressed = false; // Prevent multiple triggers
+        }
     }
 
     // Renders the game (called every frame)
@@ -109,6 +123,25 @@ public class GamePanel extends JPanel implements Runnable {
         Graphics2D g2 = (Graphics2D)g;    // Use Graphics2D for better rendering control
         tileM.draw(g2);     // Draw background tiles first
         player.draw(g2);    // Draw player on top of tiles
+
+        hud.update(player.hp, player.stamina, player.weapon.getName());  // Update HUD stats
+        hud.draw(g2);  // Draw HUD visuals
+
+        // (Ahmed) Dialogue Box - only if line is not empty
+        if (!dialogue.getLine().equals("")) {
+        // Draw background box
+        g2.setColor(new Color(0, 0, 0, 200)); // semi-transparent black
+        g2.fillRoundRect(30, screenHeight - 120, screenWidth - 60, 80, 20, 20);
+
+        // Draw text
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("Arial", Font.PLAIN, 20));
+        g2.drawString(dialogue.getLine(), 50, screenHeight - 80);
+}
+
+
         g2.dispose();       // Clean up graphics resources
+
+        
     }
 }

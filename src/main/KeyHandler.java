@@ -6,6 +6,7 @@
 // - Implements KeyListener interface for input handling (Aun)
 // - Tracks WASD movement key states (Aun)
 // - Manages sprint modifier with shift key (Aun)
+// - Adds Enter key support for dialogue interactions (Ahmed)
 // - Updates movement flags based on key events (Aun)
 /////////////////////////////////////////////////////////////////////////////
 
@@ -15,54 +16,51 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 // Handles keyboard input for the game by implementing KeyListener interface
-// Tracks the state of movement keys (WASD) and modifier keys (Shift)
+// Tracks the state of movement keys (WASD), Enter, and Shift modifiers
 public class KeyHandler implements KeyListener {
-    
-    // Movement state tracking variables
-    public boolean shiftPressed;  // Sprint modifier key state
-    public boolean upPressed;     // W key state for upward movement
-    public boolean downPressed;   // S key state for downward movement
-    public boolean leftPressed;   // A key state for left movement
-    public boolean rightPressed;  // D key state for right movement
-    
+
+    // Movement & input tracking 
+    public boolean shiftPressed;     // Sprint modifier key state
+    public boolean upPressed;        // W key state for upward movement
+    public boolean downPressed;      // S key state for downward movement
+    public boolean leftPressed;      // A key state for left movement
+    public boolean rightPressed;     // D key state for right movement
+    public boolean enterPressed;     // Enter key state for dialogue advancing (Ahmed)
+
     @Override
     // Required by KeyListener interface but unused in this implementation
-    // Called when a key is typed (pressed and released)
     public void keyTyped(KeyEvent e) {
-        // Not used in current implementation
+        // Not used (Ahmed)
     }
 
     @Override
-    // Handles key press events and updates movement flags
-    // Sets the corresponding movement flag to true when a key is pressed
+    // Handles key press events and updates input flags
     public void keyPressed(KeyEvent e) {
-        // Get the numerical code of the pressed key
         int code = e.getKeyCode();
-        
-        // Update movement flags based on WASD keys and Shift
+
+        // Toggle input flags based on key pressed
         switch(code) {
-            case KeyEvent.VK_W -> upPressed = true;     // Enable up movement
-            case KeyEvent.VK_S -> downPressed = true;   // Enable down movement
-            case KeyEvent.VK_A -> leftPressed = true;   // Enable left movement
-            case KeyEvent.VK_D -> rightPressed = true;  // Enable right movement
-            case KeyEvent.VK_SHIFT -> shiftPressed = true;  // Enable sprint modifier
+            case KeyEvent.VK_W -> upPressed = true;
+            case KeyEvent.VK_S -> downPressed = true;
+            case KeyEvent.VK_A -> leftPressed = true;
+            case KeyEvent.VK_D -> rightPressed = true;
+            case KeyEvent.VK_SHIFT -> shiftPressed = true;
+            case KeyEvent.VK_ENTER -> enterPressed = true;  // Dialogue confirm (Ahmed)
         }
     }
 
     @Override
-    // Handles key release events and updates movement flags
-    // Sets the corresponding movement flag to false when a key is released
+    // Handles key release events and resets input flags
     public void keyReleased(KeyEvent e) {
-        // Get the numerical code of the released key
         int code = e.getKeyCode();
-        
-        // Reset movement flags based on WASD keys and Shift
+
         switch(code) {
-            case KeyEvent.VK_W -> upPressed = false;     // Disable up movement
-            case KeyEvent.VK_S -> downPressed = false;   // Disable down movement
-            case KeyEvent.VK_A -> leftPressed = false;   // Disable left movement
-            case KeyEvent.VK_D -> rightPressed = false;  // Disable right movement
-            case KeyEvent.VK_SHIFT -> shiftPressed = false;  // Disable sprint modifier
+            case KeyEvent.VK_W -> upPressed = false;
+            case KeyEvent.VK_S -> downPressed = false;
+            case KeyEvent.VK_A -> leftPressed = false;
+            case KeyEvent.VK_D -> rightPressed = false;
+            case KeyEvent.VK_SHIFT -> shiftPressed = false;
+            case KeyEvent.VK_ENTER -> enterPressed = false;  // Dialogue released (Ahmed)
         }
     }
 }
