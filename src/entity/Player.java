@@ -20,12 +20,18 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import main.GamePanel;
 import main.KeyHandler;
+import entity.Weapon;
 
 // Player class representing the main character in the game
 // Extends the Entity class to inherit basic entity properties
 public final class Player extends Entity{
     GamePanel gp;       // Reference to the GamePanel instance
     KeyHandler keyH;    // Handles keyboard input
+
+    // Attributes (Ahmed)
+    public int hp;
+    public int stamina;
+    public Weapon weapon;
 
     // Screen position constants (center of screen)
     public final int screenX; // Fixed X position on screen
@@ -35,6 +41,10 @@ public final class Player extends Entity{
     public Player (GamePanel gp, KeyHandler keyH){
         this.gp = gp;
         this.keyH = keyH;
+
+        hp = 100;
+        stamina = 100;
+        weapon = new Weapon("Steel Sword", 10, 1.0, "sword");
 
         // Calculate center position of screen for player
         screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
