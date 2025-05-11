@@ -20,7 +20,6 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import main.GamePanel;
 import main.KeyHandler;
-import entity.Weapon;
 
 // Player class representing the main character in the game
 // Extends the Entity class to inherit basic entity properties
@@ -61,12 +60,17 @@ public final class Player extends Entity{
     public void setDefaultValues (){
 
         // Set initial world position to center of the map
-        // worldX = gp.tileSize*14 - gp.tileSize/2;
-        // worldY = gp.tileSize*14 - gp.tileSize/2;
         worldX = gp.tileSize*12;
         worldY = gp.tileSize*10;
         speed = 2;              // Default movement speed
         direction = "down";     // Default facing direction
+    }
+    // Sets values for player position and movement
+    public void setValues (int worldX, int worldY, String direction){
+
+        this.worldX = worldX;
+        this.worldY = worldY;
+        this.direction = direction;     
     }
 
     //Extracts a single sprite from the sprite sheet
