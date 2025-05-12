@@ -19,6 +19,7 @@ import java.awt.event.KeyListener;
 // Tracks the state of movement keys (WASD), Enter, and Shift modifiers
 public class KeyHandler implements KeyListener {
 
+    private Saver saver;
     // Movement & input tracking 
     public boolean shiftPressed;     // Sprint modifier key state
     public boolean upPressed;        // W key state for upward movement
@@ -26,7 +27,15 @@ public class KeyHandler implements KeyListener {
     public boolean leftPressed;      // A key state for left movement
     public boolean rightPressed;     // D key state for right movement
     public boolean enterPressed;     // Enter key state for dialogue advancing (Ahmed)
+    
+    // Add new button states
+    public boolean savePressed;    // F5 key for saving
+    public boolean loadPressed;    // F6 key for loading
+    public boolean deletePressed;  // F7 key for deleting save
 
+    public KeyHandler(Saver saver) {
+        this.saver = saver;
+    }
     @Override
     // Required by KeyListener interface but unused in this implementation
     public void keyTyped(KeyEvent e) {
@@ -46,7 +55,11 @@ public class KeyHandler implements KeyListener {
             case KeyEvent.VK_D -> rightPressed = true;
             case KeyEvent.VK_SHIFT -> shiftPressed = true;
             case KeyEvent.VK_ENTER -> enterPressed = true;  // Dialogue confirm (Ahmed)
+            case KeyEvent.VK_F5 -> savePressed = true;
+            case KeyEvent.VK_F6 -> loadPressed = true;
+            case KeyEvent.VK_F7 -> deletePressed = true;
         }
+        saver.handleInput(savePressed, loadPressed, deletePressed);
     }
 
     @Override
@@ -60,7 +73,11 @@ public class KeyHandler implements KeyListener {
             case KeyEvent.VK_A -> leftPressed = false;
             case KeyEvent.VK_D -> rightPressed = false;
             case KeyEvent.VK_SHIFT -> shiftPressed = false;
-            case KeyEvent.VK_ENTER -> enterPressed = false;  // Dialogue released (Ahmed)
+            case KeyEvent.VK_ENTER -> enterPressed = false; // Dialogue released (Ahmed)
+            case KeyEvent.VK_F5 -> savePressed = false;
+            case KeyEvent.VK_F6 -> loadPressed = false;
+            case KeyEvent.VK_F7 -> deletePressed = false; 
         }
+        saver.handleInput(savePressed, loadPressed, deletePressed);
     }
 }

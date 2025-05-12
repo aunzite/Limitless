@@ -1,0 +1,6 @@
+playerX
+768
+playerY
+640
+direction
+down

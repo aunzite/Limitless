@@ -12,12 +12,10 @@
 
 package main;
 
-import entity.HUD;
-import entity.Player;
+import entity.*;
 import java.awt.*;
 import javax.swing.JPanel;
 import tile.TileManager;
-import entity.Dialogue;
 
 // Main game panel class that handles the game loop, rendering and updates
 // Extends JPanel for GUI functionality and implements Runnable for the game loop
@@ -40,25 +38,34 @@ public class GamePanel extends JPanel implements Runnable {
 
     // Game Components
     private final int FPS = 60;                     // Target frames per second
-    TileManager tileM = new TileManager(this);      // Manages the game's tiles/map
-    KeyHandler keyH = new KeyHandler();             // Handles keyboard input
+    TileManager tileM;                              // Manages the game's tiles/map
+    Saver saver;                                    // Handles save/load functionality
+    KeyHandler keyH;                                // Handles keyboard input
     Thread gameThread;                              // Main game loop thread
-    public CollisionChecker cCheck = new CollisionChecker(this);
-    public Player player = new Player(this, keyH);  // Player entity
-
-    public HUD hud = new HUD(); // HUD object (Ahmed)
-    public Dialogue dialogue = new Dialogue();  // Handles NPC or story text (Ahmed)
+    public CollisionChecker cCheck;                 // Handles collision detection
+    public Player player;                           // Player entity
+    public HUD hud;                                 // HUD object
+    public Dialogue dialogue;                       // Dialogue system
 
     // Constructor: Initializes the game panel and sets up basic properties
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
         this.setBackground(Color.BLACK);
-        this.setDoubleBuffered(true);     // Enables double buffering for smooth graphics
-        this.addKeyListener(keyH);              // Enable keyboard input
-        this.setFocusable(true);      // Allow panel to receive input focus
-
+        this.setDoubleBuffered(true);
+        
+        // Initialize components in correct order
+        saver = new Saver(this);                    // Initialize saver first
+        keyH = new KeyHandler(saver);               // Pass saver to key handler
+        tileM = new TileManager(this);              // Initialize tile manager
+        cCheck = new CollisionChecker(this);        // Initialize collision checker
+        player = new Player(this, keyH);            // Initialize player last
+        hud = new HUD();                           // Initialize HUD
+        dialogue = new Dialogue();                  // Initialize dialogue system
+        
+        this.addKeyListener(keyH);                  // Enable keyboard input
+        this.setFocusable(true);                   // Allow panel to receive input focus
+        
         dialogue.setLine("Welcome to the village!");
-
     }
 
     // Starts the game thread and begins the game loop
@@ -98,9 +105,11 @@ public class GamePanel extends JPanel implements Runnable {
             // Display FPS counter every second
             if(timer >= 1000000000) {
                 System.out.println("FPS: " + drawCount);
+                System.out.println("Remember, F5 is for saving, F6 is for loading, and F7 is for deleting your save file.");
                 drawCount = 0;
                 timer = 0;
             }
+            
         }
     }
 
@@ -137,9 +146,8 @@ public class GamePanel extends JPanel implements Runnable {
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.PLAIN, 20));
         g2.drawString(dialogue.getLine(), 50, screenHeight - 80);
-}
-
-
+    }   
+    
         g2.dispose();       // Clean up graphics resources
 
         
