@@ -65,6 +65,15 @@ public final class Player extends Entity{
         speed = 2;              // Default movement speed
         direction = "down";     // Default facing direction
     }
+    public int getWorldX() {
+        return worldX;
+    }
+    public int getWorldY() {
+        return worldY;
+    }
+    public String getDirection() {
+        return direction;
+    }
     // Sets values for player position and movement
     public void setValues (int worldX, int worldY, String direction){
 
