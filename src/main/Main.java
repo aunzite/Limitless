@@ -35,6 +35,8 @@ public class Main {
         window.setLocationRelativeTo(null);                      // Center window on screen
         window.setVisible(true);                                 // Display the window
 
+        gamePanel.setupGame();
+
         // Start the game
         gamePanel.startGameThread();                               // Begin game loop execution
     }
