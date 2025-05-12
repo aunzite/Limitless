@@ -15,8 +15,7 @@ package entity;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import javax.imageio.ImageIO;
 import main.GamePanel;
 import main.KeyHandler;
@@ -178,10 +177,18 @@ public final class Player extends Entity{
 
             if (collisionOn == false) {
                 switch(direction) {
-                    case "up" -> worldY -= speed;
-                    case "down" -> worldY += speed;
-                    case "left" -> worldX -= speed;
-                    case "right" -> worldX += speed;
+                    case "up":
+                        worldY -= speed;
+                        break;
+                    case "down":
+                        worldY += speed;
+                        break;
+                    case "left":
+                        worldX -= speed;
+                        break;
+                    case "right":
+                        worldX += speed;
+                        break;
                 }
             }
 
@@ -198,16 +205,34 @@ public final class Player extends Entity{
             if(spriteCounter > 12){     // Animation speed control
 
                 // Cycle through sprite frames
-                switch (spriteNum){
-                    case 1 -> spriteNum = 2;
-                    case 2 -> spriteNum = 3;
-                    case 3 -> spriteNum = 4;
-                    case 4 -> spriteNum = 5;
-                    case 5 -> spriteNum = 6;
-                    case 6 -> spriteNum = 7;
-                    case 7 -> spriteNum = 8;
-                    case 8 -> spriteNum = 9;
-                    case 9 -> spriteNum = 1;
+                switch (spriteNum) {
+                    case 1:
+                        spriteNum = 2;
+                        break;
+                    case 2:
+                        spriteNum = 3;
+                        break;
+                    case 3:
+                        spriteNum = 4;
+                        break;
+                    case 4:
+                        spriteNum = 5;
+                        break;
+                    case 5:
+                        spriteNum = 6;
+                        break;
+                    case 6:
+                        spriteNum = 7;
+                        break;
+                    case 7:
+                        spriteNum = 8;
+                        break;
+                    case 8:
+                        spriteNum = 9;
+                        break;
+                    case 9:
+                        spriteNum = 1;
+                        break;
                 }
 
                 spriteCounter = 0;
@@ -221,63 +246,136 @@ public final class Player extends Entity{
         
         // Select correct sprite based on direction and animation frame
         switch(direction){
-            case "up" -> {
-                switch (spriteNum){
-                    case 1 -> image = up1;
-                    case 2 -> image = up2;
-                    case 3 -> image = up3;
-                    case 4 -> image = up4;
-                    case 5 -> image = up5;
-                    case 6 -> image = up6;
-                    case 7 -> image = up7;
-                    case 8 -> image = up8;
-                    case 9 -> image = up9;
+            case "up":
+                switch (spriteNum) {
+                    case 1:
+                        image = up1;
+                        break;
+                    case 2:
+                        image = up2;
+                        break;
+                    case 3:
+                        image = up3;
+                        break;
+                    case 4:
+                        image = up4;
+                        break;
+                    case 5:
+                        image = up5;
+                        break;
+                    case 6:
+                        image = up6;
+                        break;
+                    case 7:
+                        image = up7;
+                        break;
+                    case 8:
+                        image = up8;
+                        break;
+                    case 9:
+                        image = up9;
+                        break;
                 }
-            }
+                break;
 
-            case "down" -> {
-                switch (spriteNum){
-                    case 1 -> image = down1;
-                    case 2 -> image = down2;
-                    case 3 -> image = down3;
-                    case 4 -> image = down4;
-                    case 5 -> image = down5;
-                    case 6 -> image = down6;
-                    case 7 -> image = down7;
-                    case 8 -> image = down8;
-                    case 9 -> image = down9;
+            case "down":
+                switch (spriteNum) {
+                    case 1:
+                        image = down1;
+                        break;
+                    case 2:
+                        image = down2;
+                        break;
+                    case 3:
+                        image = down3;
+                        break;
+                    case 4:
+                        image = down4;
+                        break;
+                    case 5:
+                        image = down5;
+                        break;
+                    case 6:
+                        image = down6;
+                        break;
+                    case 7:
+                        image = down7;
+                        break;
+                    case 8:
+                        image = down8;
+                        break;
+                    case 9:
+                        image = down9;
+                        break;
                 }
-            }
+                break;
 
-            case "left" -> {
-                switch (spriteNum){
-                    case 1 -> image = left1;
-                    case 2 -> image = left2;
-                    case 3 -> image = left3;
-                    case 4 -> image = left4;
-                    case 5 -> image = left5;
-                    case 6 -> image = left6;
-                    case 7 -> image = left7;
-                    case 8 -> image = left8;
-                    case 9 -> image = left9;
+            case "left":
+                switch (spriteNum) {
+                    case 1:
+                        image = left1;
+                        break;
+                    case 2:
+                        image = left2;
+                        break;
+                    case 3:
+                        image = left3;
+                        break;
+                    case 4:
+                        image = left4;
+                        break;
+                    case 5:
+                        image = left5;
+                        break;
+                    case 6:
+                        image = left6;
+                        break;
+                    case 7:
+                        image = left7;
+                        break;
+                    case 8:
+                        image = left8;
+                        break;
+                    case 9:
+                        image = left9;
+                        break;
                 }
-            }
+                break;
 
-            case "right" -> {
-                switch (spriteNum){
-                    case 1 -> image = right1;
-                    case 2 -> image = right2;
-                    case 3 -> image = right3;
-                    case 4 -> image = right4;
-                    case 5 -> image = right5;
-                    case 6 -> image = right6;
-                    case 7 -> image = right7;
-                    case 8 -> image = right8;
-                    case 9 -> image = right9;
+            case "right":
+                switch (spriteNum) {
+                    case 1:
+                        image = right1;
+                        break;
+                    case 2:
+                        image = right2;
+                        break;
+                    case 3:
+                        image = right3;
+                        break;
+                    case 4:
+                        image = right4;
+                        break;
+                    case 5:
+                        image = right5;
+                        break;
+                    case 6:
+                        image = right6;
+                        break;
+                    case 7:
+                        image = right7;
+                        break;
+                    case 8:
+                        image = right8;
+                        break;
+                    case 9:
+                        image = right9;
+                        break;
                 }
-            }
-
+                break;
         }
+
+        
         
         // Draw the player sprite at screen position
         g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
