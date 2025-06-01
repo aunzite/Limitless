@@ -14,12 +14,15 @@ package main;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import entity.HUD;
 
 // Handles keyboard input for the game by implementing KeyListener interface
 // Tracks the state of movement keys (WASD), Enter, and Shift modifiers
 public class KeyHandler implements KeyListener {
 
     private Saver saver;
+    private HUD hud;
+
     // Movement & input tracking 
     public boolean shiftPressed;     // Sprint modifier key state
     public boolean upPressed;        // W key state for upward movement
@@ -33,8 +36,9 @@ public class KeyHandler implements KeyListener {
     public boolean loadPressed;    // F6 key for loading
     public boolean deletePressed;  // F7 key for deleting save
 
-    public KeyHandler(Saver saver) {
+    public KeyHandler(Saver saver, HUD hud) {
         this.saver = saver;
+        this.hud = hud;
     }
     @Override
     // Required by KeyListener interface but unused in this implementation
@@ -58,6 +62,7 @@ public class KeyHandler implements KeyListener {
             case KeyEvent.VK_F5 -> savePressed = true;
             case KeyEvent.VK_F6 -> loadPressed = true;
             case KeyEvent.VK_F7 -> deletePressed = true;
+            case KeyEvent.VK_H -> hud.setShowAttackHistory(!hud.isShowAttackHistory()); //Attack history (Ahmed)
         }
         saver.handleInput(savePressed, loadPressed, deletePressed);
     }

@@ -1,5 +1,5 @@
 package entity;
-
+import java.util.ArrayList;
 /////////////////////////////////////////////////////////////////////////////
 // Limitless
 // Weapon.java
@@ -8,16 +8,19 @@ package entity;
 // - Stores weapon stats such as name, damage, weight, and type (Ahmed)
 // - Provides accessors and mutators for managing weapon attributes (Ahmed)
 // - Includes toString method for clean text representation (Ahmed)
+// - Stores attack log
 /////////////////////////////////////////////////////////////////////////////
 
 // Weapon class used to define various weapons in the game
 public class Weapon {
 
     // Attributes (Ahmed)
-    public String name;       // Name of the weapon (e.g., "Steel Sword")
-    public int damage;        // Damage value dealt to enemies
-    public double weight;     // Weight of the weapon for balance or stamina use
-    public String type;       // Type of weapon (e.g., sword, axe, bow)
+    private String name;       // Name of the weapon (e.g., "Steel Sword")
+    private int damage;        // Damage value dealt to enemies
+    private double weight;     // Weight of the weapon for balance or stamina use
+    private String type;       // Type of weapon (e.g., sword, axe, bow)
+    private ArrayList<String> attackHistory; //Stores the attack log for this weapon 
+  
 
     // Constructor (Ahmed)
     // Initializes all weapon stats when object is created
@@ -26,8 +29,21 @@ public class Weapon {
         this.damage = damage;
         this.weight = weight;
         this.type = type;
+      attackHistory = new ArrayList<String>();
     }
-
+    
+    // Mutator (Ahmed)
+    // Adds a new attack to the weapon's history
+    public void addAttack(String target) {
+      attackHistory.add(target);
+    }
+  
+    // Accessors (Ahmed)
+    // Returns all attack history as an ArrayList
+    public ArrayList<String> getAttackHistory() {
+        return attackHistory;
+    }
+  
     // Accessors (Ahmed)
     // Returns the weapon's name
     public String getName() {

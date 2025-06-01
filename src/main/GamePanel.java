@@ -55,15 +55,15 @@ public class GamePanel extends JPanel implements Runnable {
         
         // Initialize components in correct order
         saver = new Saver(this);                    // Initialize saver first
-        keyH = new KeyHandler(saver);               // Pass saver to key handler
+        hud = new HUD();                            // Initialize HUD
+        keyH = new KeyHandler(saver, hud);          // Pass saver to key handler
         tileM = new TileManager(this);              // Initialize tile manager
         cCheck = new CollisionChecker(this);        // Initialize collision checker
         player = new Player(this, keyH);            // Initialize player last
-        hud = new HUD();                           // Initialize HUD
         dialogue = new Dialogue();                  // Initialize dialogue system
         
         this.addKeyListener(keyH);                  // Enable keyboard input
-        this.setFocusable(true);                   // Allow panel to receive input focus
+        this.setFocusable(true);          // Allow panel to receive input focus
         
         dialogue.setLine("Welcome to the village!");
     }
@@ -134,7 +134,7 @@ public class GamePanel extends JPanel implements Runnable {
         player.draw(g2);    // Draw player on top of tiles
 
         hud.update(player.hp, player.stamina, player.weapon.getName());  // Update HUD stats
-        hud.draw(g2);  // Draw HUD visuals
+        hud.draw(g2, player.weapon);  // Draw HUD visuals
 
         // (Ahmed) Dialogue Box - only if line is not empty
         if (!dialogue.getLine().equals("")) {
