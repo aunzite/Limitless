@@ -15,6 +15,7 @@ package main;
 import entity.*;
 import java.awt.*;
 import javax.swing.JPanel;
+import object.SuperObject;
 import tile.TileManager;
 
 // Main game panel class that handles the game loop, rendering and updates
@@ -23,7 +24,7 @@ public class GamePanel extends JPanel implements Runnable {
 
     // Screen Settings
     final int originalTileSize = 16;                         // Original tile size (16x16 pixels)
-    final int scale = 4;                                     // Scale factor for modern displays
+    final int scale = 5;                                     // Scale factor for modern displays
     public final int tileSize = originalTileSize * scale;    // Actual tile size used in game (48x48)
     public final int maxScreenCol = 16;                      // Number of columns that fit on screen
     public final int maxScreenRow = 12;                      // Number of rows that fit on screen
@@ -46,6 +47,9 @@ public class GamePanel extends JPanel implements Runnable {
     public Player player;                           // Player entity
     public HUD hud;                                 // HUD object
     public Dialogue dialogue;                       // Dialogue system
+    public AssetSetter aSetter;
+    public SuperObject obj [];
+
 
     // Constructor: Initializes the game panel and sets up basic properties
     public GamePanel() {
@@ -61,11 +65,18 @@ public class GamePanel extends JPanel implements Runnable {
         cCheck = new CollisionChecker(this);        // Initialize collision checker
         player = new Player(this, keyH);            // Initialize player last
         dialogue = new Dialogue();                  // Initialize dialogue system
-        
+        obj = new SuperObject[10];
+        aSetter = new AssetSetter(this);         // Initialize asset setter
         this.addKeyListener(keyH);                  // Enable keyboard input
         this.setFocusable(true);          // Allow panel to receive input focus
         
         dialogue.setLine("Welcome to the village!");
+    }
+
+    public void setupGame() {
+        obj = new SuperObject[10];              // Initialize object array
+        aSetter = new AssetSetter(this);        // Create asset setter
+        aSetter.setObject();                    // Place objects in world
     }
 
     // Starts the game thread and begins the game loop
@@ -131,7 +142,13 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g;    // Use Graphics2D for better rendering control
         tileM.draw(g2);     // Draw background tiles first
+        for (int i = 0; i < obj.length; i++) {
+            if (obj[i] != null) {
+                obj[i].draw(g2, this); // Draw objects
+            }
+        }
         player.draw(g2);    // Draw player on top of tiles
+
 
         hud.update(player.hp, player.stamina, player.weapon.getName());  // Update HUD stats
         hud.draw(g2, player.weapon);  // Draw HUD visuals
