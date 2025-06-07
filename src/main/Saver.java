@@ -12,6 +12,7 @@
 
 package main;
 import java.io.*;
+import javax.swing.JFrame;
 
 public class Saver {
     // Reference to main game panel and player state variables
@@ -19,10 +20,12 @@ public class Saver {
     private int playerX;        // Player's X coordinate in world
     private int playerY;        // Player's Y coordinate in world
     private String direction;   // Player's facing direction
+    private JFrame frame;       // Reference to the main frame for showing messages
 
     // Constructor: Sets up initial player position and direction
     public Saver(GamePanel gp) {
         this.gp = gp;
+        this.frame = gp.frame;  // Use the frame from GamePanel
         this.playerX = gp.tileSize*12;    // Default spawn X
         this.playerY = gp.tileSize*10;    // Default spawn Y
         this.direction = "down";          // Default direction
@@ -50,14 +53,26 @@ public class Saver {
         this.direction = direction; 
     }
 
+    // Helper to show confirmation message centered in the game area
+    private void showCenteredMessage(String message) {
+        int screenWidth = gp.getWidth();
+        int screenHeight = gp.getHeight();
+        int tileSizeW = screenWidth / 16;
+        int tileSizeH = screenHeight / 9;
+        int tileSize = Math.min(tileSizeW, tileSizeH);
+        int gameAreaWidth = tileSize * 16;
+        int gameAreaHeight = tileSize * 9;
+        int xOffset = (screenWidth - gameAreaWidth) / 2;
+        int yOffset = (screenHeight - gameAreaHeight) / 2;
+        new ConfirmationMessage(message).showMessage(gp, xOffset, yOffset, gameAreaWidth, gameAreaHeight);
+    }
+
     // Saves current game state to file
     public void saveGame(int playerX, int playerY, String direction) {
         // Update local state variables
         setPlayerX(playerX);
         setPlayerY(playerY);
         setDirection(direction);
-
-        // Add more data to save here
 
         try {
             // Set up file writers
@@ -69,28 +84,39 @@ public class Saver {
             pw.println("playerY\n" + getPlayerY());
             pw.println("direction\n" + getDirection());
 
-            //add more data to save here
-
-            // Cleanup and notify
-            System.out.println("Game saved!");
+            // Cleanup
             pw.close();
             fw.close();
+            
+            // Show confirmation message centered in game area
+            showCenteredMessage("Game Saved!");
         } catch (IOException e) {
-            System.out.println("Error saving game...");
+            e.printStackTrace();
         }
     }
 
     // Resets save file to default values
     public void deleteSave() {
+        File saveFile = new File("save.txt");
+        if (!saveFile.exists()) {
+            new ConfirmationMessage("No save file exists!").showMessage(frame);
+            return;
+        }
         saveGame(gp.tileSize*12, gp.tileSize*10, "down");
-        System.out.println("Save data deleted.");
+        new ConfirmationMessage("Save Deleted!").showMessage(frame);
     }
 
     // Loads game state from save file
     public void loadGame() {
+        File saveFile = new File("save.txt");
+        if (!saveFile.exists()) {
+            new ConfirmationMessage("No save file exists!").showMessage(frame);
+            return;
+        }
+
         try {
             // Set up file readers
-            FileReader fr = new FileReader("save.txt");
+            FileReader fr = new FileReader(saveFile);
             BufferedReader br = new BufferedReader(fr);
 
             // Read file line by line
@@ -111,13 +137,16 @@ public class Saver {
             }
             // Update player with loaded values
             gp.player.setValues(getPlayerX(), getPlayerY(), getDirection());
-            System.out.println("Game loaded!");
 
             // Cleanup
             br.close();
             fr.close();
+            
+            // Show confirmation message
+            new ConfirmationMessage("Game Loaded!").showMessage(frame);
         } catch (IOException e) {
-            System.out.println("Error loading game...");
+            new ConfirmationMessage("Error loading save file!").showMessage(frame);
+            e.printStackTrace();
         }
     }
 

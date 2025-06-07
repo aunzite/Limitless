@@ -15,22 +15,23 @@ package main;
 import entity.*;
 import java.awt.*;
 import javax.swing.JPanel;
+import javax.swing.JFrame;
 import object.SuperObject;
 import tile.TileManager;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 // Main game panel class that handles the game loop, rendering and updates
 // Extends JPanel for GUI functionality and implements Runnable for the game loop
 public class GamePanel extends JPanel implements Runnable {
 
-    // Screen Settings
-    final int originalTileSize = 16;                         // Original tile size (16x16 pixels)
-    final int scale = 5;                                     // Scale factor for modern displays
-    public final int tileSize = originalTileSize * scale;    // Actual tile size used in game (48x48)
-    public final int maxScreenCol = 16;                      // Number of columns that fit on screen
-    public final int maxScreenRow = 12;                      // Number of rows that fit on screen
-    public final int screenWidth = tileSize * maxScreenCol;  // Total screen width in pixels
-    public final int screenHeight = tileSize * maxScreenRow; // Total screen height in pixels
-
+    // Screen settings
+    public int screenWidth;
+    public int screenHeight;
+    public int tileSize;
+    
     // World Settings
     public final int maxWorldCol = 69;                       // Total number of columns in world map
     public final int maxWorldRow = 39;                       // Total number of rows in world map
@@ -38,39 +39,89 @@ public class GamePanel extends JPanel implements Runnable {
     public final int worldHeight = tileSize * maxWorldRow;   // Total world height in pixels
 
     // Game Components
-    private final int FPS = 60;                     // Target frames per second
-    TileManager tileM;                              // Manages the game's tiles/map
-    Saver saver;                                    // Handles save/load functionality
-    KeyHandler keyH;                                // Handles keyboard input
-    Thread gameThread;                              // Main game loop thread
+    private int FPS = 60;                     // Target frames per second
+    public TileManager tileM;                              // Manages the game's tiles/map
+    private Saver saver;                                    // Handles save/load functionality
+    private KeyHandler keyH;                                // Handles keyboard input
+    private Thread gameThread;                              // Main game loop thread
     public CollisionChecker cCheck;                 // Handles collision detection
     public Player player;                           // Player entity
     public HUD hud;                                 // HUD object
     public Dialogue dialogue;                       // Dialogue system
     public AssetSetter aSetter;
     public SuperObject obj [];
+    public NPC npc;                                 // NPC entity
 
+    // Game state
+    private boolean gamePaused = false;
+    private boolean inDialogue = false;
+
+    public JFrame frame;  // Changed to public
+    private boolean isFullscreen = false;
 
     // Constructor: Initializes the game panel and sets up basic properties
-    public GamePanel() {
+    public GamePanel(JFrame frame) {
+        this.frame = frame;
+        
+        // Set default screen dimensions
+        screenWidth = 1536;
+        screenHeight = 864;
+        tileSize = screenWidth / 16; // Initial tile size
+        
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
         this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
         
         // Initialize components in correct order
-        saver = new Saver(this);                    // Initialize saver first
-        hud = new HUD();                            // Initialize HUD
-        keyH = new KeyHandler(saver, hud);          // Pass saver to key handler
-        tileM = new TileManager(this);              // Initialize tile manager
-        cCheck = new CollisionChecker(this);        // Initialize collision checker
-        player = new Player(this, keyH);            // Initialize player last
-        dialogue = new Dialogue();                  // Initialize dialogue system
-        obj = new SuperObject[10];
-        aSetter = new AssetSetter(this);         // Initialize asset setter
-        this.addKeyListener(keyH);                  // Enable keyboard input
-        this.setFocusable(true);          // Allow panel to receive input focus
+        saver = new Saver(this);
+        hud = new HUD();
+        keyH = new KeyHandler(saver, hud);
+        this.addKeyListener(keyH);
+        this.setFocusable(true);
         
-        dialogue.setLine("Welcome to the village!");
+        // Initialize game objects
+        tileM = new TileManager(this);
+        cCheck = new CollisionChecker(this);
+        player = new Player(this, keyH);
+        npc = new NPC(this, keyH);
+        dialogue = new Dialogue(this);
+        
+        // Set initial positions
+        player.worldX = (screenWidth / 2) + (tileSize * 5);  // Move 5 tiles right
+        player.worldY = (screenHeight / 2) + (tileSize * 5); // Move 5 tiles down
+        npc.worldX = (screenWidth / 2) + (tileSize * 15);    // Position NPC near water
+        npc.worldY = (screenHeight / 2) + (tileSize * 7);    // Position NPC slightly below the water
+        
+        // Set frame to maximized
+        frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+    }
+
+    private void toggleFullscreen() {
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice gd = ge.getDefaultScreenDevice();
+        
+        if (!isFullscreen) {
+            // Enter fullscreen
+            gd.setFullScreenWindow(frame);
+            isFullscreen = true;
+        } else {
+            // Exit fullscreen
+            gd.setFullScreenWindow(null);
+            isFullscreen = false;
+        }
+        
+        // Update screen dimensions
+        screenWidth = frame.getWidth();
+        screenHeight = frame.getHeight();
+        
+        // Update tile size based on screen dimensions
+        tileSize = screenWidth / 16; // Adjust this ratio as needed
+        
+        // Update player and NPC positions
+        player.worldX = screenWidth / 2;
+        player.worldY = screenHeight / 2;
+        npc.worldX = screenWidth / 2 - 100;
+        npc.worldY = screenHeight / 2;
     }
 
     public void setupGame() {
@@ -112,14 +163,6 @@ public class GamePanel extends JPanel implements Runnable {
                 delta--;     // Reset time accumulator
                 drawCount++;
             }
-
-            // Display FPS counter every second
-            if(timer >= 1000000000) {
-                System.out.println("FPS: " + drawCount);
-                System.out.println("Remember, F5 is for saving, F6 is for loading, and F7 is for deleting your save file.");
-                drawCount = 0;
-                timer = 0;
-            }
             
         }
     }
@@ -127,11 +170,18 @@ public class GamePanel extends JPanel implements Runnable {
     // Updates game state (called every frame)
     public void update() {
         player.update();    // Update player position and state
+        npc.update();       // Update NPC state
         
-        // (Ahmed) If Enter is pressed and there's dialogue, clear it
+        // Handle fullscreen toggle
+        if (keyH.f11Pressed) {
+            toggleFullscreen();
+            keyH.f11Pressed = false;
+        }
+        
+        // Handle dialogue clearing
         if (keyH.enterPressed && !dialogue.getLine().equals("")) {
-        dialogue.clear();
-        keyH.enterPressed = false; // Prevent multiple triggers
+            dialogue.clear();
+            keyH.enterPressed = false; // Prevent multiple triggers
         }
     }
 
@@ -139,34 +189,105 @@ public class GamePanel extends JPanel implements Runnable {
     // Order of drawing determines layer visibility
     @Override
     public void paintComponent(Graphics g) {
+        // Update dynamic values
+        screenWidth = getWidth();
+        screenHeight = getHeight();
+        // Calculate tileSize to preserve 16:9 aspect ratio and keep tiles square
+        int tileSizeW = screenWidth / 16;
+        int tileSizeH = screenHeight / 9;
+        tileSize = Math.min(tileSizeW, tileSizeH);
+        int gameAreaWidth = tileSize * 16;
+        int gameAreaHeight = tileSize * 9;
+        int xOffset = (screenWidth - gameAreaWidth) / 2;
+        int yOffset = (screenHeight - gameAreaHeight) / 2;
+        
         super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D)g;    // Use Graphics2D for better rendering control
-        tileM.draw(g2);     // Draw background tiles first
-        for (int i = 0; i < obj.length; i++) {
-            if (obj[i] != null) {
-                obj[i].draw(g2, this); // Draw objects
+        Graphics2D g2 = (Graphics2D)g;
+        // Draw black bars (letterboxing/pillarboxing)
+        g2.setColor(Color.BLACK);
+        if (xOffset > 0) {
+            g2.fillRect(0, 0, xOffset, screenHeight); // Left bar
+            g2.fillRect(screenWidth - xOffset, 0, xOffset, screenHeight); // Right bar
+        }
+        if (yOffset > 0) {
+            g2.fillRect(0, 0, screenWidth, yOffset); // Top bar
+            g2.fillRect(0, screenHeight - yOffset, screenWidth, yOffset); // Bottom bar
+        }
+        // Translate graphics context to game area
+        g2.translate(xOffset, yOffset);
+        
+        // Draw tiles
+        tileM.draw(g2);
+        
+        // Draw objects
+        for(int i = 0; i < obj.length; i++) {
+            if(obj[i] != null) {
+                obj[i].draw(g2, this);
             }
         }
-        player.draw(g2);    // Draw player on top of tiles
-
-
-        hud.update(player.hp, player.stamina, player.weapon.getName());  // Update HUD stats
-        hud.draw(g2, player.weapon);  // Draw HUD visuals
-
-        // (Ahmed) Dialogue Box - only if line is not empty
-        if (!dialogue.getLine().equals("")) {
-        // Draw background box
-        g2.setColor(new Color(0, 0, 0, 200)); // semi-transparent black
-        g2.fillRoundRect(30, screenHeight - 120, screenWidth - 60, 80, 20, 20);
-
-        // Draw text
-        g2.setColor(Color.WHITE);
-        g2.setFont(new Font("Arial", Font.PLAIN, 20));
-        g2.drawString(dialogue.getLine(), 50, screenHeight - 80);
-    }   
-    
-        g2.dispose();       // Clean up graphics resources
-
         
+        // Draw NPC
+        npc.draw(g2);
+        
+        // Draw player
+        player.draw(g2);
+        
+        // Draw HUD
+        hud.draw(g2, player.weapon);
+        
+        // Draw save/load/delete instructions
+        drawSaveLoadInstructions(g2);
+        
+        // Draw dialogue if active
+        if(!dialogue.getLine().equals("")) {
+            dialogue.draw(g2);
+        }
+        
+        // At the end, reset translation if needed
+        g2.translate(-xOffset, -yOffset);
+        g2.dispose();
+    }
+
+    // Draw save/load/delete instructions
+    private void drawSaveLoadInstructions(Graphics2D g2) {
+        if (!keyH.upPressed && !keyH.downPressed && !keyH.leftPressed && !keyH.rightPressed) {
+            try {
+                // Load the instruction images
+                BufferedImage f5Sprite = ImageIO.read(new File("res/buttons/f5.png"));
+                BufferedImage f6Sprite = ImageIO.read(new File("res/buttons/f6.png"));
+                BufferedImage f7Sprite = ImageIO.read(new File("res/buttons/f7.png"));
+                
+                // Set black color for text
+                g2.setColor(new Color(0, 0, 0, 200));
+                g2.setFont(new Font("Arial", Font.BOLD, 16));
+                
+                // Draw sprites in top right corner
+                int x = screenWidth - 60;  // Moved even more to the right
+                int y = 20;
+                int spriteSize = 32;
+                int verticalSpacing = 50;
+                
+                // Draw F5 sprite and text
+                g2.drawImage(f5Sprite, x, y, spriteSize, spriteSize, null);
+                String f5Text = "Save";
+                FontMetrics fm = g2.getFontMetrics();
+                int textWidth = fm.stringWidth(f5Text);
+                g2.drawString(f5Text, x - textWidth - 10, y + spriteSize/2 + 5);
+                
+                // Draw F6 sprite and text
+                g2.drawImage(f6Sprite, x, y + verticalSpacing, spriteSize, spriteSize, null);
+                String f6Text = "Load";
+                textWidth = fm.stringWidth(f6Text);
+                g2.drawString(f6Text, x - textWidth - 10, y + verticalSpacing + spriteSize/2 + 5);
+                
+                // Draw F7 sprite and text
+                g2.drawImage(f7Sprite, x, y + verticalSpacing * 2, spriteSize, spriteSize, null);
+                String f7Text = "Delete";
+                textWidth = fm.stringWidth(f7Text);
+                g2.drawString(f7Text, x - textWidth - 10, y + verticalSpacing * 2 + spriteSize/2 + 5);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

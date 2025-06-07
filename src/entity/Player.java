@@ -154,7 +154,6 @@ public final class Player extends Entity{
     
     // Updates player position and animation state based on input
     public void update(){
-
         // Only update if movement keys are pressed
         if(keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true || keyH.rightPressed == true){
             
@@ -172,7 +171,9 @@ public final class Player extends Entity{
                 direction = "right";
             }
 
-            collisionOn = false; //Check tile collision
+            collisionOn = false; // Reset collision state
+            
+            // Check tile collision
             gp.cCheck.checkTile(this);
 
             if (collisionOn == false) {
