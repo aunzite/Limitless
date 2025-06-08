@@ -1,74 +1,77 @@
 package entity;
+
 import java.util.ArrayList;
-/////////////////////////////////////////////////////////////////////////////
-// Limitless
-// Weapon.java
-// 
-// Description: Defines weapons that can be used by the player or other entities. 
-// - Stores weapon stats such as name, damage, weight, and type (Ahmed)
-// - Provides accessors and mutators for managing weapon attributes (Ahmed)
-// - Includes toString method for clean text representation (Ahmed)
-// - Stores attack log
-/////////////////////////////////////////////////////////////////////////////
 
-// Weapon class used to define various weapons in the game
 public class Weapon {
-
-    // Attributes (Ahmed)
+    // Attributes
     private String name;       // Name of the weapon (e.g., "Steel Sword")
     private int damage;        // Damage value dealt to enemies
     private double weight;     // Weight of the weapon for balance or stamina use
     private String type;       // Type of weapon (e.g., sword, axe, bow)
-    private ArrayList<String> attackHistory; //Stores the attack log for this weapon 
-  
+    private ArrayList<String> attackHistory; // Stores the attack log for this weapon
 
-    // Constructor (Ahmed)
-    // Initializes all weapon stats when object is created
+    // Constructor
     public Weapon(String name, int damage, double weight, String type) {
         this.name = name;
         this.damage = damage;
         this.weight = weight;
         this.type = type;
-      attackHistory = new ArrayList<String>();
+        this.attackHistory = new ArrayList<>();
     }
     
-    // Mutator (Ahmed)
-    // Adds a new attack to the weapon's history
+    // Add a new attack to the weapon's history
     public void addAttack(String target) {
-      attackHistory.add(target);
+        attackHistory.add(target);
     }
   
-    // Accessors (Ahmed)
-    // Returns all attack history as an ArrayList
+    // Get all attack history
     public ArrayList<String> getAttackHistory() {
         return attackHistory;
     }
   
-    // Accessors (Ahmed)
-    // Returns the weapon's name
+    // Get weapon name
     public String getName() {
         return name;
     }
 
-    // Returns the weapon's damage value
+    // Get weapon damage
     public int getDamage() {
         return damage;
     }
 
-    // Mutators (Ahmed)
-    // Updates the weapon's name
+    // Get weapon weight
+    public double getWeight() {
+        return weight;
+    }
+
+    // Get weapon type
+    public String getType() {
+        return type;
+    }
+
+    // Set weapon name
     public void setName(String name) {
         this.name = name;
     }
 
-    // Updates the weapon's damage value
+    // Set weapon damage
     public void setDamage(int damage) {
         this.damage = damage;
     }
 
-    // toString override (Ahmed)
-    // Returns a readable string representing the weapon
+    // Set weapon weight
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
+    // Set weapon type
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    // Get string representation of the weapon
+    @Override
     public String toString() {
         return name + " (Damage: " + damage + ", Type: " + type + ")";
     }
-}
+} 

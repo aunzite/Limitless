@@ -42,7 +42,7 @@ public class GamePanel extends JPanel implements Runnable {
     private int FPS = 60;                     // Target frames per second
     public TileManager tileM;                              // Manages the game's tiles/map
     private Saver saver;                                    // Handles save/load functionality
-    private KeyHandler keyH;                                // Handles keyboard input
+    public KeyHandler keyH;                                // Handles keyboard input
     private Thread gameThread;                              // Main game loop thread
     public CollisionChecker cCheck;                 // Handles collision detection
     public Player player;                           // Player entity
@@ -51,13 +51,23 @@ public class GamePanel extends JPanel implements Runnable {
     public AssetSetter aSetter;
     public SuperObject obj [];
     public NPC npc;                                 // NPC entity
+    public Menu menu;                               // Main menu
+    public OptionsMenu optionsMenu;                 // Options menu
 
     // Game state
+    public static final int MENU_STATE = 0;
+    public static final int PLAY_STATE = 1;
+    public static final int DIALOGUE_STATE = 2;
+    public static final int OPTIONS_STATE = 3;
+    public int gameState = MENU_STATE;
     private boolean gamePaused = false;
     private boolean inDialogue = false;
 
     public JFrame frame;  // Changed to public
     private boolean isFullscreen = false;
+
+    private float saveLoadAlpha = 0f;
+    private static final float FADE_SPEED = 0.05f;
 
     // Constructor: Initializes the game panel and sets up basic properties
     public GamePanel(JFrame frame) {
@@ -69,13 +79,15 @@ public class GamePanel extends JPanel implements Runnable {
         tileSize = screenWidth / 16; // Initial tile size
         
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
-        this.setBackground(Color.BLACK);
         this.setDoubleBuffered(true);
         
         // Initialize components in correct order
         saver = new Saver(this);
-        hud = new HUD();
-        keyH = new KeyHandler(saver, hud);
+        keyH = new KeyHandler(saver, null);  // Create KeyHandler first with null HUD
+        hud = new HUD(keyH);  // Create HUD with KeyHandler
+        keyH.setHUD(hud);  // Set HUD in KeyHandler
+        menu = new Menu(this);
+        optionsMenu = new OptionsMenu(this);
         this.addKeyListener(keyH);
         this.setFocusable(true);
         
@@ -169,8 +181,23 @@ public class GamePanel extends JPanel implements Runnable {
 
     // Updates game state (called every frame)
     public void update() {
-        player.update();    // Update player position and state
-        npc.update();       // Update NPC state
+        if (gameState == MENU_STATE) {
+            menu.update();
+            return;
+        }
+        
+        if (gameState == OPTIONS_STATE) {
+            optionsMenu.update();
+            return;
+        }
+        
+        // Always update NPC to handle dialogue
+        npc.update();
+        
+        // Only update player if not in dialogue
+        if (gameState == PLAY_STATE) {
+            player.update();
+        }
         
         // Handle fullscreen toggle
         if (keyH.f11Pressed) {
@@ -203,6 +230,21 @@ public class GamePanel extends JPanel implements Runnable {
         
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g;
+        
+        // Clear the background
+        g2.setColor(Color.BLACK);
+        g2.fillRect(0, 0, screenWidth, screenHeight);
+        
+        if (gameState == MENU_STATE) {
+            menu.draw(g2);
+            return;
+        }
+        
+        if (gameState == OPTIONS_STATE) {
+            optionsMenu.draw(g2);
+            return;
+        }
+        
         // Draw black bars (letterboxing/pillarboxing)
         g2.setColor(Color.BLACK);
         if (xOffset > 0) {
@@ -250,12 +292,25 @@ public class GamePanel extends JPanel implements Runnable {
 
     // Draw save/load/delete instructions
     private void drawSaveLoadInstructions(Graphics2D g2) {
-        if (!keyH.upPressed && !keyH.downPressed && !keyH.leftPressed && !keyH.rightPressed) {
+        boolean isMoving = keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed;
+        
+        // Update fade effect
+        if (!isMoving && saveLoadAlpha < 1f) {
+            saveLoadAlpha = Math.min(1f, saveLoadAlpha + FADE_SPEED);
+        } else if (isMoving && saveLoadAlpha > 0f) {
+            saveLoadAlpha = Math.max(0f, saveLoadAlpha - FADE_SPEED);
+        }
+
+        // Only draw if there's any alpha
+        if (saveLoadAlpha > 0) {
             try {
-                // Load the instruction images
-                BufferedImage f5Sprite = ImageIO.read(new File("res/buttons/f5.png"));
-                BufferedImage f6Sprite = ImageIO.read(new File("res/buttons/f6.png"));
-                BufferedImage f7Sprite = ImageIO.read(new File("res/buttons/f7.png"));
+                // Load the correct button images based on pressed state
+                BufferedImage f5Sprite = ImageIO.read(new File(keyH.savePressed ? "res/buttons/f5p.png" : "res/buttons/f5o.png"));
+                BufferedImage f6Sprite = ImageIO.read(new File(keyH.loadPressed ? "res/buttons/f6p.png" : "res/buttons/f6o.png"));
+                BufferedImage f7Sprite = ImageIO.read(new File(keyH.deletePressed ? "res/buttons/f7p.png" : "res/buttons/f7o.png"));
+                
+                // Set composite for fade effect
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, saveLoadAlpha));
                 
                 // Set black color for text
                 g2.setColor(new Color(0, 0, 0, 200));
@@ -285,6 +340,9 @@ public class GamePanel extends JPanel implements Runnable {
                 String f7Text = "Delete";
                 textWidth = fm.stringWidth(f7Text);
                 g2.drawString(f7Text, x - textWidth - 10, y + verticalSpacing * 2 + spriteSize/2 + 5);
+
+                // Reset composite
+                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
             } catch (IOException e) {
                 e.printStackTrace();
             }

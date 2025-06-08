@@ -1,0 +1,28 @@
+Elaria:
+"Ah! You're awake… and still breathing. That's rare around here."
+
+[She looks at the water, then back at you.]
+
+"This village was once full of light—children playing by this pond, laughter echoing near the ruins. Until he came."
+
+"Noxar. A bloodthirsty tyrant cloaked in shadow. Not man, not machine—just hunger. He's draining life from the land. One by one, my people fell… turned into his digital thralls."
+
+"But there is hope. My family guarded something sacred. Something… ancient."
+
+[She turns toward the ruins. You hear a faint hum. She hands you a blade.]
+
+"This is Solthorn, the holy blade. Forged in the Flame of Dawns, passed down by my fathers through generations. Now, it answers to you."
+
+"Before you charge into doom like the others, remember this—"
+
+"Press E to interact with people, objects, and relics."
+
+"Press Space to swing your sword. Quick and clean."
+
+"Hold Shift to sprint. You'll need it to dodge or chase."
+
+"Use F5, F6, and F7 to save, load, or erase your progress."
+
+"And keep an eye on your stamina. You'll tire fast if you swing without purpose."
+
+"Go east, past the ruins. His first minion nests there—one of many. Defeat them all… and bring light back to our world."

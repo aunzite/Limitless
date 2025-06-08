@@ -42,7 +42,7 @@ public final class Player extends Entity{
 
         hp = 100;
         stamina = 100;
-        weapon = new Weapon("Steel Sword", 10, 1.0, "sword");
+        weapon = null; // Start with no weapon
 
         // Calculate center position of screen for player
         screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
@@ -57,11 +57,10 @@ public final class Player extends Entity{
 
     // Sets default values for player position and movement
     public void setDefaultValues (){
-
         // Set initial world position to center of the map
         worldX = gp.tileSize*12;
         worldY = gp.tileSize*10;
-        speed = 2;              // Default movement speed
+        speed = 4;              // Increased default movement speed from 3 to 4
         direction = "down";     // Default facing direction
     }
     public int getWorldX() {
@@ -154,20 +153,26 @@ public final class Player extends Entity{
     
     // Updates player position and animation state based on input
     public void update(){
+        // Don't process movement if in dialogue
+        if (gp.gameState == GamePanel.DIALOGUE_STATE) {
+            return;
+        }
+
+        boolean isMoving = keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed;
+        
         // Only update if movement keys are pressed
-        if(keyH.upPressed == true || keyH.downPressed == true || keyH.leftPressed == true || keyH.rightPressed == true){
-            
+        if(isMoving) {
             // Update direction and position based on key input
-            if(keyH.upPressed == true){
+            if(keyH.upPressed) {
                 direction = "up";
             }
-            if(keyH.downPressed == true){
+            if(keyH.downPressed) {
                 direction = "down";
             }
-            if(keyH.leftPressed == true){
+            if(keyH.leftPressed) {
                 direction = "left";
             }
-            if(keyH.rightPressed == true){
+            if(keyH.rightPressed) {
                 direction = "right";
             }
 
@@ -176,69 +181,51 @@ public final class Player extends Entity{
             // Check tile collision
             gp.cCheck.checkTile(this);
 
-            if (collisionOn == false) {
+            if (!collisionOn) {
+                // Handle sprinting
+                if (keyH.shiftPressed && gp.hud.canSprint()) {
+                    speed = 8;  // Sprint speed
+                    gp.hud.drainStamina();
+                } else {
+                    speed = 4;   // Normal speed
+                }
+                
+                // Move the player
                 switch(direction) {
-                    case "up":
-                        worldY -= speed;
-                        break;
-                    case "down":
-                        worldY += speed;
-                        break;
-                    case "left":
-                        worldX -= speed;
-                        break;
-                    case "right":
-                        worldX += speed;
-                        break;
+                    case "up" -> worldY -= speed;
+                    case "down" -> worldY += speed;
+                    case "left" -> worldX -= speed;
+                    case "right" -> worldX += speed;
                 }
-            }
-
-            // Handle sprint speed
-            if (keyH.shiftPressed == true){
-                speed = 10;           // Sprint speed
-            }
-            else{
-                speed = 2;          // Normal speed
-            }
-    
-            // Animation handling
-            spriteCounter++;
-            if(spriteCounter > 12){     // Animation speed control
-
-                // Cycle through sprite frames
-                switch (spriteNum) {
-                    case 1:
+                
+                // Only update animation if actually moving
+                spriteCounter++;
+                if (spriteCounter > 12) {
+                    if (spriteNum == 1) {
                         spriteNum = 2;
-                        break;
-                    case 2:
+                    } else if (spriteNum == 2) {
                         spriteNum = 3;
-                        break;
-                    case 3:
+                    } else if (spriteNum == 3) {
                         spriteNum = 4;
-                        break;
-                    case 4:
-                        spriteNum = 5;
-                        break;
-                    case 5:
-                        spriteNum = 6;
-                        break;
-                    case 6:
-                        spriteNum = 7;
-                        break;
-                    case 7:
-                        spriteNum = 8;
-                        break;
-                    case 8:
-                        spriteNum = 9;
-                        break;
-                    case 9:
+                    } else {
                         spriteNum = 1;
-                        break;
+                    }
+                    spriteCounter = 0;
                 }
-
-                spriteCounter = 0;
             }
+        } else {
+            // Reset animation when not moving
+            spriteNum = 1;
+            spriteCounter = 0;
         }
+        
+        // Update stamina
+        gp.hud.regenerateStamina(isMoving);
+        stamina = gp.hud.getStamina();
+        
+        // Update HUD
+        String weaponName = weapon != null ? weapon.getName() : "No Weapon";
+        gp.hud.update(hp, stamina, weaponName, isMoving);
     }
     
     // Draws the player with current sprite based on direction and animation frame

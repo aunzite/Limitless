@@ -1,6 +1,6 @@
 playerX
-1152
+1296
 playerY
-960
+1608
 direction
-down
+right

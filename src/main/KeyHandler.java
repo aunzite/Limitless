@@ -32,6 +32,7 @@ public class KeyHandler implements KeyListener {
     public boolean enterPressed;     // Enter key state for dialogue advancing (Ahmed)
     public boolean ePressed;         // E key state for NPC interaction
     public boolean f11Pressed;       // F11 key state for fullscreen toggle
+    public boolean escapePressed;    // Escape key state for quitting
     
     // Add new button states
     public boolean savePressed;    // F5 key for saving
@@ -42,6 +43,11 @@ public class KeyHandler implements KeyListener {
         this.saver = saver;
         this.hud = hud;
     }
+
+    public void setHUD(HUD hud) {
+        this.hud = hud;
+    }
+
     @Override
     // Required by KeyListener interface but unused in this implementation
     public void keyTyped(KeyEvent e) {
@@ -63,6 +69,7 @@ public class KeyHandler implements KeyListener {
             case KeyEvent.VK_ENTER -> enterPressed = true;  // Dialogue confirm (Ahmed)
             case KeyEvent.VK_E -> ePressed = true;         // NPC interaction
             case KeyEvent.VK_F11 -> f11Pressed = true;     // Fullscreen toggle
+            case KeyEvent.VK_ESCAPE -> escapePressed = true; // Escape key for quitting
             case KeyEvent.VK_F5 -> savePressed = true;
             case KeyEvent.VK_F6 -> loadPressed = true;
             case KeyEvent.VK_F7 -> deletePressed = true;
@@ -85,6 +92,7 @@ public class KeyHandler implements KeyListener {
             case KeyEvent.VK_ENTER -> enterPressed = false; // Dialogue released (Ahmed)
             case KeyEvent.VK_E -> ePressed = false;        // NPC interaction released
             case KeyEvent.VK_F11 -> f11Pressed = false;    // Fullscreen toggle released
+            case KeyEvent.VK_ESCAPE -> escapePressed = false; // Escape key released
             case KeyEvent.VK_F5 -> savePressed = false;
             case KeyEvent.VK_F6 -> loadPressed = false;
             case KeyEvent.VK_F7 -> deletePressed = false; 

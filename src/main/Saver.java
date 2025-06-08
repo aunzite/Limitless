@@ -53,19 +53,6 @@ public class Saver {
         this.direction = direction; 
     }
 
-    // Helper to show confirmation message centered in the game area
-    private void showCenteredMessage(String message) {
-        int screenWidth = gp.getWidth();
-        int screenHeight = gp.getHeight();
-        int tileSizeW = screenWidth / 16;
-        int tileSizeH = screenHeight / 9;
-        int tileSize = Math.min(tileSizeW, tileSizeH);
-        int gameAreaWidth = tileSize * 16;
-        int gameAreaHeight = tileSize * 9;
-        int xOffset = (screenWidth - gameAreaWidth) / 2;
-        int yOffset = (screenHeight - gameAreaHeight) / 2;
-        new ConfirmationMessage(message).showMessage(gp, xOffset, yOffset, gameAreaWidth, gameAreaHeight);
-    }
 
     // Saves current game state to file
     public void saveGame(int playerX, int playerY, String direction) {
@@ -89,7 +76,7 @@ public class Saver {
             fw.close();
             
             // Show confirmation message centered in game area
-            showCenteredMessage("Game Saved!");
+            new ConfirmationMessage("Game Saved!").showMessage(frame);
         } catch (IOException e) {
             e.printStackTrace();
         }
