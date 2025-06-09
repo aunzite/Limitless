@@ -163,11 +163,15 @@ public final class Player extends Entity{
 
     // Loads all player sprites from the sprite sheets
     public void getPlayerImage() {
+        getPlayerImageFromDir("res/player/");
+    }
+
+    public void getPlayerImageFromDir(String baseDir) {
         try {
             // Sprite sheet configuration
-            String idleSheetPath = "res/player/idle.png";
-            String walkSheetPath = "res/player/walk.png";
-            String runSheetPath = "res/player/run.png";
+            String idleSheetPath = baseDir + "idle.png";
+            String walkSheetPath = baseDir + "walk.png";
+            String runSheetPath = baseDir + "run.png";
             int walkSpriteWidth = 29;
             int walkSpriteHeight = 53;
             int walkOffsetX = 15;
@@ -241,6 +245,14 @@ public final class Player extends Entity{
             right10 = runRight[0]; right11 = runRight[1]; right12 = runRight[2]; right13 = runRight[3]; right14 = runRight[4]; right15 = runRight[5]; right16 = runRight[6]; right17 = runRight[7];
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    public void setSwordTextures(boolean hasSword) {
+        if (hasSword) {
+            getPlayerImageFromDir("res/player/withSword/");
+        } else {
+            getPlayerImageFromDir("res/player/");
         }
     }
     

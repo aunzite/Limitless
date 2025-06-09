@@ -220,11 +220,16 @@ public class Inventory {
                             break;
                         }
                     }
+                    // If Solthorn was equipped, unequip and revert textures
+                    if (gp.player.weapon != null && gp.player.weapon.getName().equalsIgnoreCase("Solthorn")) {
+                        gp.player.weapon = null;
+                        gp.player.setSwordTextures(false);
+                    }
                 }
                 items[contextMenuRow][contextMenuCol] = null;
                 closeMenus();
                 break;
-            case 1: // Use/Equip
+            case 1: // Use/Equip/Unequip
                 if (item.getName().toLowerCase().contains("apple")) {
                     // Apple restores 20 health and 15 stamina
                     gp.player.hp = Math.min(100, gp.player.hp + 20);
@@ -239,8 +244,19 @@ public class Inventory {
                     gp.player.stamina = newStamina;
                     gp.hud.setStamina(newStamina); // Keep HUD and player in sync
                     items[contextMenuRow][contextMenuCol] = null;
+                } else if (item.getName().equalsIgnoreCase("Solthorn")) {
+                    if (gp.player.weapon != null && gp.player.weapon.getName().equalsIgnoreCase("Solthorn")) {
+                        // Unequip
+                        gp.player.weapon = null;
+                        gp.player.setSwordTextures(false);
+                    } else {
+                        // Equip
+                        gp.player.weapon = new Weapon(item.getName(), 25, 1.0, "sword");
+                        gp.player.setSwordTextures(true);
+                    }
                 } else if (item.getName().toLowerCase().contains("sword") || item.getName().toLowerCase().contains("weapon")) {
                     gp.player.weapon = new Weapon(item.getName(), 10, 1.0, "sword");
+                    gp.player.setSwordTextures(false);
                 }
                 closeMenus();
                 break;
@@ -320,7 +336,16 @@ public class Inventory {
         String title = item.getName() + (item.getQuantity() > 1 ? " x" + item.getQuantity() : "");
         g2.drawString(title, x + 16, y + 32);
         // Buttons
-        String[] btns = {"Drop", "Use/Equip", "Details"};
+        String[] btns;
+        if (item.getName().equalsIgnoreCase("Solthorn")) {
+            if (gp.player.weapon != null && gp.player.weapon.getName().equalsIgnoreCase("Solthorn")) {
+                btns = new String[]{"Drop", "Unequip", "Details"};
+            } else {
+                btns = new String[]{"Drop", "Equip", "Details"};
+            }
+        } else {
+            btns = new String[]{"Drop", "Use/Equip", "Details"};
+        }
         for (int i = 0; i < 3; i++) {
             int btnY = y + 40 + i * (BUTTON_HEIGHT + BUTTON_MARGIN + 10); // Add 10px extra gap for more vertical space
             g2.setColor(i == hoveredButton ? new Color(100, 100, 255) : new Color(60, 60, 60));
