@@ -38,6 +38,7 @@ public class KeyHandler implements KeyListener {
     public boolean savePressed;    // F5 key for saving
     public boolean loadPressed;    // F6 key for loading
     public boolean deletePressed;  // F7 key for deleting save
+    public boolean iPressed;       // I key for inventory
 
     public KeyHandler(Saver saver, HUD hud) {
         this.saver = saver;
@@ -74,6 +75,7 @@ public class KeyHandler implements KeyListener {
             case KeyEvent.VK_F6 -> loadPressed = true;
             case KeyEvent.VK_F7 -> deletePressed = true;
             case KeyEvent.VK_H -> hud.setShowAttackHistory(!hud.isShowAttackHistory()); //Attack history (Ahmed)
+            case KeyEvent.VK_I -> iPressed = true;         // Inventory toggle
         }
         saver.handleInput(savePressed, loadPressed, deletePressed);
     }
@@ -96,6 +98,7 @@ public class KeyHandler implements KeyListener {
             case KeyEvent.VK_F5 -> savePressed = false;
             case KeyEvent.VK_F6 -> loadPressed = false;
             case KeyEvent.VK_F7 -> deletePressed = false; 
+            case KeyEvent.VK_I -> iPressed = false;        // Inventory toggle released
         }
         saver.handleInput(savePressed, loadPressed, deletePressed);
     }

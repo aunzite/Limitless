@@ -172,6 +172,8 @@ public class OptionsMenu implements MouseListener, MouseMotionListener {
     // MouseListener methods
     @Override
     public void mouseClicked(MouseEvent e) {
+        if (gp.gameState != GamePanel.OPTIONS_STATE) return;
+        
         Point mousePoint = e.getPoint();
         
         // Check back button
@@ -197,12 +199,15 @@ public class OptionsMenu implements MouseListener, MouseMotionListener {
     
     @Override
     public void mouseExited(MouseEvent e) {
+        if (gp.gameState != GamePanel.OPTIONS_STATE) return;
         hoveredOption = -1;
     }
     
     // MouseMotionListener methods
     @Override
     public void mouseMoved(MouseEvent e) {
+        if (gp.gameState != GamePanel.OPTIONS_STATE) return;
+        
         // Check which option is being hovered
         if (autoSaveToggle.contains(e.getPoint())) {
             hoveredOption = 0;

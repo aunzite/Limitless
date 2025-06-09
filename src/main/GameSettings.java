@@ -90,6 +90,7 @@ public class GameSettings {
                 writer.println("keybind:" + entry.getKey() + "=" + entry.getValue());
             }
         } catch (IOException e) {
+            System.err.println("Error saving settings: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -97,6 +98,7 @@ public class GameSettings {
     public void loadSettings() {
         File file = new File(SETTINGS_FILE);
         if (!file.exists()) {
+            saveSettings();
             return;
         }
         
@@ -109,18 +111,24 @@ public class GameSettings {
                 String key = parts[0];
                 String value = parts[1];
                 
-                if (key.equals("brightness")) {
-                    brightness = Float.parseFloat(value);
-                } else if (key.equals("contrast")) {
-                    contrast = Float.parseFloat(value);
-                } else if (key.equals("autosave")) {
-                    autoSaveEnabled = Boolean.parseBoolean(value);
-                } else if (key.startsWith("keybind:")) {
-                    String action = key.substring(8);
-                    keybinds.put(action, Integer.parseInt(value));
+                try {
+                    if (key.equals("brightness")) {
+                        brightness = Float.parseFloat(value);
+                    } else if (key.equals("contrast")) {
+                        contrast = Float.parseFloat(value);
+                    } else if (key.equals("autosave")) {
+                        autoSaveEnabled = Boolean.parseBoolean(value);
+                    } else if (key.startsWith("keybind:")) {
+                        String action = key.substring(8);
+                        keybinds.put(action, Integer.parseInt(value));
+                    }
+                } catch (NumberFormatException e) {
+                    System.err.println("Error parsing setting value: " + value);
+                    e.printStackTrace();
                 }
             }
         } catch (IOException e) {
+            System.err.println("Error loading settings: " + e.getMessage());
             e.printStackTrace();
         }
     }

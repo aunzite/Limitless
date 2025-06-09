@@ -1,17 +1,16 @@
 package main;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.awt.geom.AffineTransform;
 
-public class Menu implements MouseListener, MouseMotionListener {
+public class PauseMenu implements MouseListener, MouseMotionListener {
     private GamePanel gp;
     private int selectedOption = 0;
-    private final String[] options = {"Play", "Options", "Quit"};
+    private final String[] options = {"Resume", "Main Menu", "Quit"};
     private Font titleFont;
     private Font menuFont;
     private Rectangle[] optionBounds;
@@ -19,15 +18,9 @@ public class Menu implements MouseListener, MouseMotionListener {
     private float[] optionScales;
     private static final float SCALE_SPEED = 0.1f;
     private static final float MAX_SCALE = 1.2f;
-    private GifImage backgroundGif;
-    private GameSettings settings;
-    private BufferedImage frameBuffer;
-    private int frameWidth;
-    private int frameHeight;
     
-    public Menu(GamePanel gp) {
+    public PauseMenu(GamePanel gp) {
         this.gp = gp;
-        this.settings = GameSettings.getInstance();
         
         // Initialize fonts
         titleFont = new Font("Arial", Font.BOLD, 60);
@@ -40,23 +33,6 @@ public class Menu implements MouseListener, MouseMotionListener {
             optionScales[i] = 1.0f;
             // Initialize option bounds with default values
             optionBounds[i] = new Rectangle(0, 0, 0, 0);
-        }
-        
-        // Load background GIF
-        try {
-            backgroundGif = new GifImage("res/menu/menu.gif");
-            // Create a fixed-size buffer for the animation
-            if (backgroundGif != null) {
-                BufferedImage firstFrame = backgroundGif.getCurrentFrame();
-                if (firstFrame != null) {
-                    frameWidth = gp.screenWidth;
-                    frameHeight = gp.screenHeight;
-                    frameBuffer = new BufferedImage(frameWidth, frameHeight, BufferedImage.TYPE_INT_ARGB);
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading background GIF: " + e.getMessage());
-            e.printStackTrace();
         }
         
         // Add mouse listeners
@@ -87,16 +63,21 @@ public class Menu implements MouseListener, MouseMotionListener {
             handleSelection(selectedOption);
             gp.keyH.enterPressed = false;
         }
+        
+        // Handle escape key to resume
+        if (gp.keyH.escapePressed) {
+            gp.gameState = GamePanel.PLAY_STATE;
+            gp.keyH.escapePressed = false;
+        }
     }
     
     private void handleSelection(int option) {
         switch (option) {
-            case 0: // Play
-                gp.saver.loadGame(); // Load saved game state
+            case 0: // Resume
                 gp.gameState = GamePanel.PLAY_STATE;
                 break;
-            case 1: // Options
-                gp.gameState = GamePanel.OPTIONS_STATE;
+            case 1: // Main Menu
+                gp.gameState = GamePanel.MENU_STATE;
                 break;
             case 2: // Quit
                 System.exit(0);
@@ -105,35 +86,13 @@ public class Menu implements MouseListener, MouseMotionListener {
     }
     
     public void draw(Graphics2D g2) {
-        // Draw background GIF
-        if (backgroundGif != null && frameBuffer != null) {
-            BufferedImage currentFrame = backgroundGif.getCurrentFrame();
-            if (currentFrame != null) {
-                // Clear the buffer
-                Graphics2D bufferG2 = frameBuffer.createGraphics();
-                bufferG2.setColor(new Color(0, 0, 0, 0));
-                bufferG2.fillRect(0, 0, frameWidth, frameHeight);
-                
-                // Draw the current frame scaled to fit the buffer
-                bufferG2.drawImage(currentFrame, 0, 0, frameWidth, frameHeight, null);
-                bufferG2.dispose();
-                
-                // Draw the buffer to the screen
-                g2.drawImage(frameBuffer, 0, 0, null);
-            }
-        } else {
-            // If no GIF is loaded, draw a black background
-            g2.setColor(Color.BLACK);
-            g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
-        }
-        
-        // Draw semi-transparent overlay with reduced opacity
-        g2.setColor(new Color(0, 0, 0, 100));
+        // Draw semi-transparent black overlay
+        g2.setColor(new Color(0, 0, 0, 180));
         g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
         
         // Draw title
         g2.setFont(titleFont);
-        String title = "LIMITLESS";
+        String title = "PAUSED";
         FontMetrics fm = g2.getFontMetrics();
         int titleX = (gp.screenWidth - fm.stringWidth(title)) / 2;
         int titleY = gp.screenHeight / 4;
@@ -148,44 +107,42 @@ public class Menu implements MouseListener, MouseMotionListener {
         g2.setFont(menuFont);
         fm = g2.getFontMetrics();
         int optionY = gp.screenHeight / 2;
+        int optionSpacing = 60;
         
         for (int i = 0; i < options.length; i++) {
-            String option = options[i];
-            int optionWidth = fm.stringWidth(option);
-            int optionX = (gp.screenWidth - optionWidth) / 2;
+            // Calculate option position
+            int optionX = (gp.screenWidth - fm.stringWidth(options[i])) / 2;
             
             // Update option bounds for mouse interaction
-            optionBounds[i] = new Rectangle(optionX - 10, optionY - fm.getHeight(), 
-                                          optionWidth + 20, fm.getHeight() + 10);
+            optionBounds[i] = new Rectangle(
+                optionX - 20,
+                optionY - fm.getHeight() + 5,
+                fm.stringWidth(options[i]) + 40,
+                fm.getHeight() + 10
+            );
             
-            // Save the current transform
+            // Apply scale transformation
             AffineTransform oldTransform = g2.getTransform();
+            g2.translate(optionX + fm.stringWidth(options[i]) / 2, optionY);
+            g2.scale(optionScales[i], optionScales[i]);
+            g2.translate(-(optionX + fm.stringWidth(options[i]) / 2), -optionY);
             
-            // Apply scaling transformation
-            float scale = optionScales[i];
-            g2.translate(optionX + optionWidth/2, optionY);
-            g2.scale(scale, scale);
-            g2.translate(-(optionX + optionWidth/2), -optionY);
-            
-            // Draw option with shadow
+            // Draw option text with shadow
             g2.setColor(new Color(0, 0, 0, 150));
-            g2.drawString(option, optionX + 2, optionY + 2);
-            
-            // Always use white color for options
+            g2.drawString(options[i], optionX + 4, optionY + 4);
             g2.setColor(Color.WHITE);
-            g2.drawString(option, optionX, optionY);
+            g2.drawString(options[i], optionX, optionY);
             
-            // Restore the original transform
+            // Restore original transform
             g2.setTransform(oldTransform);
             
-            optionY += 60;
+            optionY += optionSpacing;
         }
     }
     
-    // MouseListener methods
     @Override
     public void mouseClicked(MouseEvent e) {
-        if (gp.gameState != GamePanel.MENU_STATE) return;
+        if (gp.gameState != GamePanel.PAUSE_STATE) return;
         
         Point mousePoint = e.getPoint();
         for (int i = 0; i < options.length; i++) {
@@ -207,14 +164,13 @@ public class Menu implements MouseListener, MouseMotionListener {
     
     @Override
     public void mouseExited(MouseEvent e) {
-        if (gp.gameState != GamePanel.MENU_STATE) return;
+        if (gp.gameState != GamePanel.PAUSE_STATE) return;
         hoveredOption = -1;
     }
     
-    // MouseMotionListener methods
     @Override
     public void mouseMoved(MouseEvent e) {
-        if (gp.gameState != GamePanel.MENU_STATE) return;
+        if (gp.gameState != GamePanel.PAUSE_STATE) return;
         
         Point mousePoint = e.getPoint();
         for (int i = 0; i < options.length; i++) {

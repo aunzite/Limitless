@@ -130,7 +130,7 @@ public class NPC extends Entity {
 
     private void loadStory() {
         try {
-            List<String> lines = Files.readAllLines(Paths.get("src/dialogue/elaria.txt"));
+            List<String> lines = Files.readAllLines(Paths.get("res/dialogue/elaria.txt"));
             StringBuilder paragraph = new StringBuilder();
             for (String line : lines) {
                 if (line.trim().isEmpty()) {
@@ -317,14 +317,6 @@ public class NPC extends Entity {
         int drawX = screenX - (drawWidth - gp.tileSize) / 2;
         int drawY = screenY - (drawHeight - gp.tileSize);
         g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
-        // DEBUG: Draw the NPC's hitbox in green, fully opaque
-        int hitboxWidth = (int)(playerHitbox.width * scale);
-        int hitboxHeight = (int)(playerHitbox.height * scale);
-        int hitboxScreenX = drawX + (drawWidth - hitboxWidth) / 2;
-        int hitboxScreenY = drawY + (drawHeight - hitboxHeight);
-        g2.setColor(new java.awt.Color(0, 255, 0, 255));
-        g2.drawRect(hitboxScreenX, hitboxScreenY, hitboxWidth, hitboxHeight);
-        System.out.println("Elaria hitbox: x=" + hitboxScreenX + ", y=" + hitboxScreenY + ", w=" + hitboxWidth + ", h=" + hitboxHeight);
 
         // Draw interaction message if player is in range
         if (inRange) {

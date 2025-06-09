@@ -22,10 +22,13 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 
 // Main game panel class that handles the game loop, rendering and updates
 // Extends JPanel for GUI functionality and implements Runnable for the game loop
-public class GamePanel extends JPanel implements Runnable {
+public class GamePanel extends JPanel implements Runnable, MouseListener, MouseMotionListener {
 
     // Screen settings
     public int screenWidth;
@@ -41,7 +44,7 @@ public class GamePanel extends JPanel implements Runnable {
     // Game Components
     private int FPS = 60;                     // Target frames per second
     public TileManager tileM;                              // Manages the game's tiles/map
-    private Saver saver;                                    // Handles save/load functionality
+    public Saver saver;                                    // Handles save/load functionality
     public KeyHandler keyH;                                // Handles keyboard input
     private Thread gameThread;                              // Main game loop thread
     public CollisionChecker cCheck;                 // Handles collision detection
@@ -53,14 +56,16 @@ public class GamePanel extends JPanel implements Runnable {
     public NPC npc;                                 // NPC entity
     public Menu menu;                               // Main menu
     public OptionsMenu optionsMenu;                 // Options menu
+    public PauseMenu pauseMenu;  // Add pause menu reference
 
     // Game state
     public static final int MENU_STATE = 0;
     public static final int PLAY_STATE = 1;
     public static final int DIALOGUE_STATE = 2;
     public static final int OPTIONS_STATE = 3;
+    public static final int PAUSE_STATE = 4;
     public int gameState = MENU_STATE;
-    private boolean gamePaused = false;
+    public boolean gamePaused = false;
     private boolean inDialogue = false;
 
     public JFrame frame;  // Changed to public
@@ -68,6 +73,9 @@ public class GamePanel extends JPanel implements Runnable {
 
     private float saveLoadAlpha = 0f;
     private static final float FADE_SPEED = 0.05f;
+
+    // Add this field to GamePanel:
+    private boolean canPickup = true;
 
     // Constructor: Initializes the game panel and sets up basic properties
     public GamePanel(JFrame frame) {
@@ -83,13 +91,20 @@ public class GamePanel extends JPanel implements Runnable {
         
         // Initialize components in correct order
         saver = new Saver(this);
-        keyH = new KeyHandler(saver, null);  // Create KeyHandler first with null HUD
-        hud = new HUD(keyH);  // Create HUD with KeyHandler
-        keyH.setHUD(hud);  // Set HUD in KeyHandler
+        hud = new HUD(null);  // Create HUD first with null KeyHandler
+        keyH = new KeyHandler(saver, hud);  // Create KeyHandler with HUD
+        hud.setKeyHandler(keyH);  // Set KeyHandler in HUD
+        
+        // Load settings before initializing menus
+        GameSettings.getInstance().loadSettings();
+        
         menu = new Menu(this);
         optionsMenu = new OptionsMenu(this);
+        pauseMenu = new PauseMenu(this);  // Initialize pause menu
         this.addKeyListener(keyH);
         this.setFocusable(true);
+        this.addMouseListener(this);
+        this.addMouseMotionListener(this);
         
         // Initialize game objects
         tileM = new TileManager(this);
@@ -97,6 +112,7 @@ public class GamePanel extends JPanel implements Runnable {
         player = new Player(this, keyH);
         npc = new NPC(this, keyH);
         dialogue = new Dialogue(this);
+        aSetter = new AssetSetter(this);
         
         // Set initial positions
         player.worldX = (screenWidth / 2) + (tileSize * 5);  // Move 5 tiles right
@@ -106,6 +122,9 @@ public class GamePanel extends JPanel implements Runnable {
         
         // Set frame to maximized
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        
+        // Set initial game state to MENU_STATE
+        gameState = MENU_STATE;
     }
 
     private void toggleFullscreen() {
@@ -138,8 +157,10 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void setupGame() {
         obj = new SuperObject[10];              // Initialize object array
-        aSetter = new AssetSetter(this);        // Create asset setter
         aSetter.setObject();                    // Place objects in world
+        // Add test items to inventory AFTER everything is initialized
+        player.inventory.addItem(new OBJ_Apple());
+        player.inventory.addItem(new OBJ_Apple());
     }
 
     // Starts the game thread and begins the game loop
@@ -191,10 +212,17 @@ public class GamePanel extends JPanel implements Runnable {
             return;
         }
         
-        // Always update NPC to handle dialogue
-        npc.update();
+        if (gameState == PAUSE_STATE) {
+            pauseMenu.update();
+            return;
+        }
         
-        // Only update player if not in dialogue
+        // Only update NPC if inventory is not open
+        if (!player.inventory.isOpen()) {
+            npc.update();
+        }
+        
+        // Always update player
         if (gameState == PLAY_STATE) {
             player.update();
         }
@@ -209,6 +237,12 @@ public class GamePanel extends JPanel implements Runnable {
         if (keyH.enterPressed && !dialogue.getLine().equals("")) {
             dialogue.clear();
             keyH.enterPressed = false; // Prevent multiple triggers
+        }
+        
+        // Handle pause menu toggle
+        if (keyH.escapePressed && gameState == PLAY_STATE) {
+            gameState = PAUSE_STATE;
+            keyH.escapePressed = false;
         }
     }
 
@@ -231,10 +265,10 @@ public class GamePanel extends JPanel implements Runnable {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g;
         
-        // Clear the background
+        // Always clear with full black
         g2.setColor(Color.BLACK);
         g2.fillRect(0, 0, screenWidth, screenHeight);
-        
+
         if (gameState == MENU_STATE) {
             menu.draw(g2);
             return;
@@ -245,6 +279,20 @@ public class GamePanel extends JPanel implements Runnable {
             return;
         }
         
+        if (gameState == PAUSE_STATE) {
+            // Draw the game state first
+            drawGameState(g2, xOffset, yOffset);
+            // Then draw the pause menu on top
+            pauseMenu.draw(g2);
+            return;
+        }
+        
+        // Draw the game state
+        drawGameState(g2, xOffset, yOffset);
+    }
+    
+    // Helper method to draw the game state
+    private void drawGameState(Graphics2D g2, int xOffset, int yOffset) {
         // Draw black bars (letterboxing/pillarboxing)
         g2.setColor(Color.BLACK);
         if (xOffset > 0) {
@@ -261,10 +309,22 @@ public class GamePanel extends JPanel implements Runnable {
         // Draw tiles
         tileM.draw(g2);
         
-        // Draw objects
+        // Draw objects and check for nearby items
+        String nearbyItemDesc = null;
         for(int i = 0; i < obj.length; i++) {
             if(obj[i] != null) {
                 obj[i].draw(g2, this);
+                
+                // Check if player is near this item
+                int distance = (int) Math.sqrt(
+                    Math.pow(obj[i].worldX - player.worldX, 2) + 
+                    Math.pow(obj[i].worldY - player.worldY, 2)
+                );
+                if (distance < tileSize * 2) { // Within 2 tiles
+                    if (obj[i] instanceof object.OBJ_Apple) {
+                        nearbyItemDesc = ((object.OBJ_Apple)obj[i]).getDescription();
+                    }
+                }
             }
         }
         
@@ -285,9 +345,71 @@ public class GamePanel extends JPanel implements Runnable {
             dialogue.draw(g2);
         }
         
+        int appleScreenX = -1, appleScreenY = -1, appleObjIndex = -1, appleQuantity = 1;
+        if (nearbyItemDesc != null) {
+            // Find the apple's screen position and index
+            for(int i = 0; i < obj.length; i++) {
+                if(obj[i] != null && obj[i] instanceof object.OBJ_Apple) {
+                    int distance = (int) Math.sqrt(
+                        Math.pow(obj[i].worldX - player.worldX, 2) + 
+                        Math.pow(obj[i].worldY - player.worldY, 2)
+                    );
+                    if (distance < tileSize * 2) {
+                        appleScreenX = obj[i].worldX - player.worldX + player.screenX;
+                        appleScreenY = obj[i].worldY - player.worldY + player.screenY;
+                        appleObjIndex = i;
+                        appleQuantity = ((object.OBJ_Apple)obj[i]).quantity;
+                        break;
+                    }
+                }
+            }
+        }
+        // Draw item description if near an item
+        if (nearbyItemDesc != null && appleScreenX != -1 && appleScreenY != -1) {
+            int w = 340;
+            int h = 160;
+            int size = tileSize / 2;
+            // Move the box further up and right
+            int x = appleScreenX + size + 32; // more right
+            int y = appleScreenY - h + 10; // more up
+            // Clamp to screen bounds
+            if (x + w > screenWidth) x = screenWidth - w - 10;
+            if (y < 10) y = 10;
+            if (y + h > screenHeight) y = screenHeight - h - 10;
+            String name = "Apple";
+            String[] lines = {"A fresh, juicy apple that restores your vitality.", "Effect: Restores 20 health and 15 stamina."};
+            entity.Inventory.drawDetailsPopupBox(g2, x, y, w, h, name, lines, appleQuantity);
+            // Draw fading 'Press e to pick up' at the bottom of the box
+            float alpha = (float)(0.5 + 0.5 * Math.sin(System.currentTimeMillis() / 400.0));
+            g2.setFont(g2.getFont().deriveFont(Font.ITALIC, 16f));
+            g2.setColor(new Color(255,255,255,(int)(220*alpha)));
+            String pickupMsg = "Press e to pick up";
+            int msgWidth = g2.getFontMetrics().stringWidth(pickupMsg);
+            int msgX = x + (w - msgWidth) / 2;
+            int msgY = y + h - 18;
+            g2.drawString(pickupMsg, msgX, msgY);
+            // Handle E key for pickup
+            if (keyH.ePressed && canPickup && appleObjIndex != -1) {
+                // Add all apples to inventory (stack)
+                int qty = ((object.OBJ_Apple)obj[appleObjIndex]).quantity;
+                player.inventory.addItem(new entity.OBJ_Apple(qty));
+                obj[appleObjIndex] = null;
+                canPickup = false;
+            }
+            if (!keyH.ePressed) {
+                canPickup = true;
+            }
+        }
+        
+        // Draw inventory overlay and inventory/items on top of everything
+        if (player.inventory.isOpen()) {
+            g2.setColor(new Color(0, 0, 0, 128));
+            g2.fillRect(-xOffset, -yOffset, screenWidth, screenHeight);
+            player.inventory.draw(g2);
+        }
+        
         // At the end, reset translation if needed
         g2.translate(-xOffset, -yOffset);
-        g2.dispose();
     }
 
     // Draw save/load/delete instructions
@@ -348,4 +470,38 @@ public class GamePanel extends JPanel implements Runnable {
             }
         }
     }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        if (player.inventory.isOpen()) {
+            boolean isRightClick = javax.swing.SwingUtilities.isRightMouseButton(e);
+            player.inventory.handleMousePress(e.getX(), e.getY(), isRightClick);
+        }
+    }
+
+    @Override
+    public void mouseDragged(MouseEvent e) {
+        if (player.inventory.isOpen()) {
+            player.inventory.handleMouseDrag(e.getX(), e.getY());
+        }
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        if (player.inventory.isOpen()) {
+            player.inventory.handleMouseRelease(e.getX(), e.getY());
+        }
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {}
+
+    @Override
+    public void mouseEntered(MouseEvent e) {}
+
+    @Override
+    public void mouseExited(MouseEvent e) {}
+
+    @Override
+    public void mouseMoved(MouseEvent e) {}
 }

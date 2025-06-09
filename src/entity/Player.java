@@ -30,6 +30,7 @@ public final class Player extends Entity{
     public int hp;
     public int stamina;
     public Weapon weapon;
+    public Inventory inventory; // Add inventory field
 
     // Screen position constants (center of screen)
     public final int screenX; // Fixed X position on screen
@@ -58,6 +59,7 @@ public final class Player extends Entity{
         hp = 100;
         stamina = 100;
         weapon = null; // Start with no weapon
+        inventory = new Inventory(gp); // Use new Inventory constructor
 
         // Calculate center position of screen for player
         screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
@@ -244,6 +246,17 @@ public final class Player extends Entity{
     
     // Updates player position and animation state based on input
     public void update() {
+        // Handle inventory toggle/close
+        if (keyH.iPressed) {
+            inventory.toggle();
+            keyH.iPressed = false;
+        }
+
+        // Don't process movement if inventory is open
+        if (inventory.isOpen()) {
+            return;
+        }
+
         // Always increment spriteCounter
         spriteCounter++;
         // Don't process movement if in dialogue
@@ -266,7 +279,7 @@ public final class Player extends Entity{
                 spriteNum = (spriteNum == 1) ? 2 : 1;
                 spriteCounter = 0;
             }
-        } else if (isRunning) {
+        } else if (isRunning && stamina > 0) {
             animationState = "run";
             if (!prevAnimationState.equals("run")) {
                 spriteNum = 10; // Start at first run frame
@@ -298,7 +311,8 @@ public final class Player extends Entity{
             } else if (keyH.rightPressed) {
                 direction = "right";
             }
-            int moveSpeed = isRunning ? speed * 2 : speed;
+            // Only allow running if stamina is above 0
+            int moveSpeed = (isRunning && stamina > 0) ? speed * 2 : speed;
             for (int i = 0; i < moveSpeed; i++) {
                 int prevX = worldX;
                 int prevY = worldY;
@@ -320,6 +334,11 @@ public final class Player extends Entity{
         }
         
         // Update stamina
+        if (isRunning && stamina > 0) {
+            gp.hud.drainStamina();
+        } else {
+            gp.hud.regenerateStamina(isMoving);
+        }
         stamina = gp.hud.getStamina();
         
         // Update HUD
@@ -329,6 +348,21 @@ public final class Player extends Entity{
     
     // Draws the player with current sprite based on direction and animation frame
     public void draw(Graphics2D g2){
+        // Draw inventory overlay if open
+        if (inventory.isOpen()) {
+            // Draw 50% opacity black rectangle over everything
+            g2.setColor(new java.awt.Color(0, 0, 0, 128));
+            g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+            // Draw inventory and items on top
+            inventory.draw(g2);
+            // Always draw HUD on top of inventory
+            String weaponName = weapon != null ? weapon.getName() : "No Weapon";
+            gp.hud.update(hp, stamina, weaponName, false);
+            gp.hud.draw(g2, weapon);
+            return; // Don't draw player or anything else
+        }
+
+        // Draw player sprite
         BufferedImage image = null;
         switch (animationState) {
             case "idle":
@@ -420,13 +454,5 @@ public final class Player extends Entity{
         int drawX = screenX - drawWidth / 2 + gp.tileSize / 2;
         int drawY = screenY - drawHeight + gp.tileSize;
         g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
-        // DEBUG: Draw the player's hitbox in blue, fully opaque
-        int hitboxWidth = (int)(playerHitbox.width * scale);
-        int hitboxHeight = (int)(playerHitbox.height * scale);
-        int hitboxScreenX = drawX + (drawWidth - hitboxWidth) / 2;
-        int hitboxScreenY = drawY + (drawHeight - hitboxHeight);
-        g2.setColor(new java.awt.Color(0, 0, 255, 255));
-        g2.drawRect(hitboxScreenX, hitboxScreenY, hitboxWidth, hitboxHeight);
-        System.out.println("Player hitbox: x=" + hitboxScreenX + ", y=" + hitboxScreenY + ", w=" + hitboxWidth + ", h=" + hitboxHeight);
     }
 }
