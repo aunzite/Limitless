@@ -13,6 +13,7 @@
 package main;
 import java.io.*;
 import javax.swing.JFrame;
+import entity.Weapon;
 
 public class Saver {
     // Reference to main game panel and player state variables
@@ -70,6 +71,13 @@ public class Saver {
             pw.println("playerX\n" + getPlayerX());
             pw.println("playerY\n" + getPlayerY());
             pw.println("direction\n" + getDirection());
+            
+            // Save weapon state
+            if (gp.player.weapon != null) {
+                pw.println("weapon\n" + gp.player.weapon.getName());
+            } else {
+                pw.println("weapon\nnull");
+            }
 
             // Cleanup
             pw.close();
@@ -119,6 +127,14 @@ public class Saver {
                         break;
                     case "direction":
                         setDirection(br.readLine());
+                        break;
+                    case "weapon":
+                        String weaponName = br.readLine();
+                        if (!weaponName.equals("null")) {
+                            gp.player.weapon = new Weapon(weaponName, 25, 1.0, "sword");
+                        } else {
+                            gp.player.weapon = null;
+                        }
                         break;
                 }
             }

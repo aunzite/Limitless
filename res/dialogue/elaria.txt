@@ -10,6 +10,7 @@ Elaria:
 "But there is hope. My family guarded something sacred. Something… ancient."
 
 [She turns toward the ruins. You hear a faint hum. She hands you a blade.]
+[Weapon: Solthorn]
 
 "This is Solthorn, the holy blade. Forged in the Flame of Dawns, passed down by my fathers through generations. Now, it answers to you."
 
