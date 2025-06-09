@@ -69,7 +69,7 @@ public class NPC extends Entity {
     public void getNPCImage() {
         try {
             // Sprite sheet configuration
-            String spriteSheetPath = "res/player/walkNPC.png";
+            String spriteSheetPath = "res/elaria/walk.png";
             int spriteWidth = 39;
             int spriteHeight = 50;
             

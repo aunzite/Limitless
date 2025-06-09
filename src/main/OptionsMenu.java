@@ -22,8 +22,7 @@ public class OptionsMenu implements MouseListener, MouseMotionListener {
     
     // UI elements
     private Rectangle backButton;
-    private Rectangle[] brightnessSliders;
-    private Rectangle[] contrastSliders;
+    private Rectangle autoSaveToggle;
     private BufferedImage backgroundImage;
     
     // Fonts
@@ -41,24 +40,17 @@ public class OptionsMenu implements MouseListener, MouseMotionListener {
         menuFont = new Font("Arial", Font.PLAIN, 30);
         
         // Initialize option scales
-        optionScales = new float[2]; // Brightness, Contrast
+        optionScales = new float[1]; // Auto-save
         for (int i = 0; i < optionScales.length; i++) {
             optionScales[i] = 1.0f;
         }
         
-        // Initialize slider arrays
-        brightnessSliders = new Rectangle[1];
-        contrastSliders = new Rectangle[1];
-        
-        // Create slider rectangles
-        int sliderWidth = 200;
-        int sliderHeight = 20;
-        int sliderX = gp.screenWidth / 2 - sliderWidth / 2;
-        int brightnessY = gp.screenHeight / 2;
-        int contrastY = brightnessY + 100;
-        
-        brightnessSliders[0] = new Rectangle(sliderX, brightnessY, sliderWidth, sliderHeight);
-        contrastSliders[0] = new Rectangle(sliderX, contrastY, sliderWidth, sliderHeight);
+        // Initialize auto-save toggle
+        int toggleWidth = 100;
+        int toggleHeight = 50;
+        int toggleX = gp.screenWidth / 2 - toggleWidth / 2;
+        int toggleY = gp.screenHeight / 2;
+        autoSaveToggle = new Rectangle(toggleX, toggleY, toggleWidth, toggleHeight);
         
         // Initialize back button
         backButton = new Rectangle(gp.screenWidth / 2 - 100, gp.screenHeight - 100, 200, 50);
@@ -132,71 +124,34 @@ public class OptionsMenu implements MouseListener, MouseMotionListener {
         // Draw options
         g2.setFont(menuFont);
         fm = g2.getFontMetrics();
-        int startY = gp.screenHeight / 3;
-        int spacing = 80;
         
-        // Draw brightness slider
-        drawBrightnessSlider(g2, startY);
-        
-        // Draw contrast slider
-        drawContrastSlider(g2, startY + spacing);
+        // Draw auto-save toggle
+        drawAutoSaveToggle(g2);
         
         // Draw back button
         drawBackButton(g2);
     }
     
-    private void drawBrightnessSlider(Graphics2D g2, int y) {
-        String label = "Brightness";
+    private void drawAutoSaveToggle(Graphics2D g2) {
+        String label = "Auto Save";
         FontMetrics fm = g2.getFontMetrics();
         int labelX = gp.screenWidth / 4;
+        int labelY = gp.screenHeight / 2 + fm.getAscent() / 2;
         
         // Draw label
         g2.setColor(Color.WHITE);
-        g2.drawString(label, labelX, y);
+        g2.drawString(label, labelX, labelY);
         
-        // Draw slider
-        int sliderX = gp.screenWidth / 2;
-        int sliderWidth = 200;
-        int sliderHeight = 20;
-        
-        // Draw slider background
+        // Draw toggle button
         g2.setColor(Color.DARK_GRAY);
-        g2.fillRect(sliderX, y - sliderHeight, sliderWidth, sliderHeight);
+        g2.fillRect(autoSaveToggle.x, autoSaveToggle.y, autoSaveToggle.width, autoSaveToggle.height);
         
-        // Draw slider handle
-        int handleX = sliderX + (int)(settings.getBrightness() * sliderWidth / 2.0f);
+        // Draw toggle state
+        String state = settings.isAutoSaveEnabled() ? "ON" : "OFF";
         g2.setColor(Color.WHITE);
-        g2.fillRect(handleX - 5, y - sliderHeight - 5, 10, sliderHeight + 10);
-        
-        // Store slider bounds for mouse interaction
-        brightnessSliders[0] = new Rectangle(sliderX, y - sliderHeight, sliderWidth, sliderHeight);
-    }
-    
-    private void drawContrastSlider(Graphics2D g2, int y) {
-        String label = "Contrast";
-        FontMetrics fm = g2.getFontMetrics();
-        int labelX = gp.screenWidth / 4;
-        
-        // Draw label
-        g2.setColor(Color.WHITE);
-        g2.drawString(label, labelX, y);
-        
-        // Draw slider
-        int sliderX = gp.screenWidth / 2;
-        int sliderWidth = 200;
-        int sliderHeight = 20;
-        
-        // Draw slider background
-        g2.setColor(Color.DARK_GRAY);
-        g2.fillRect(sliderX, y - sliderHeight, sliderWidth, sliderHeight);
-        
-        // Draw slider handle
-        int handleX = sliderX + (int)(settings.getContrast() * sliderWidth / 2.0f);
-        g2.setColor(Color.WHITE);
-        g2.fillRect(handleX - 5, y - sliderHeight - 5, 10, sliderHeight + 10);
-        
-        // Store slider bounds for mouse interaction
-        contrastSliders[0] = new Rectangle(sliderX, y - sliderHeight, sliderWidth, sliderHeight);
+        int stateX = autoSaveToggle.x + (autoSaveToggle.width - fm.stringWidth(state)) / 2;
+        int stateY = autoSaveToggle.y + (autoSaveToggle.height + fm.getAscent()) / 2;
+        g2.drawString(state, stateX, stateY);
     }
     
     private void drawBackButton(Graphics2D g2) {
@@ -225,18 +180,9 @@ public class OptionsMenu implements MouseListener, MouseMotionListener {
             return;
         }
         
-        // Check brightness slider
-        if (brightnessSliders[0].contains(mousePoint)) {
-            float value = (float)(mousePoint.x - brightnessSliders[0].x) / brightnessSliders[0].width;
-            value = Math.max(0.0f, Math.min(1.0f, value));
-            settings.setBrightness(value * 2.0f);
-        }
-        
-        // Check contrast slider
-        if (contrastSliders[0].contains(mousePoint)) {
-            float value = (float)(mousePoint.x - contrastSliders[0].x) / contrastSliders[0].width;
-            value = Math.max(0.0f, Math.min(1.0f, value));
-            settings.setContrast(value * 2.0f);
+        // Check auto-save toggle
+        if (autoSaveToggle.contains(mousePoint)) {
+            settings.setAutoSaveEnabled(!settings.isAutoSaveEnabled());
         }
     }
     
@@ -258,31 +204,13 @@ public class OptionsMenu implements MouseListener, MouseMotionListener {
     @Override
     public void mouseMoved(MouseEvent e) {
         // Check which option is being hovered
-        if (brightnessSliders[0].contains(e.getPoint())) {
+        if (autoSaveToggle.contains(e.getPoint())) {
             hoveredOption = 0;
-        } else if (contrastSliders[0].contains(e.getPoint())) {
-            hoveredOption = 1;
         } else {
             hoveredOption = -1;
         }
     }
     
     @Override
-    public void mouseDragged(MouseEvent e) {
-        Point mousePoint = e.getPoint();
-        
-        // Handle brightness slider drag
-        if (brightnessSliders[0].contains(mousePoint)) {
-            float value = (float)(mousePoint.x - brightnessSliders[0].x) / brightnessSliders[0].width;
-            value = Math.max(0.0f, Math.min(1.0f, value));
-            settings.setBrightness(value * 2.0f);
-        }
-        
-        // Handle contrast slider drag
-        if (contrastSliders[0].contains(mousePoint)) {
-            float value = (float)(mousePoint.x - contrastSliders[0].x) / contrastSliders[0].width;
-            value = Math.max(0.0f, Math.min(1.0f, value));
-            settings.setContrast(value * 2.0f);
-        }
-    }
+    public void mouseDragged(MouseEvent e) {}
 } 

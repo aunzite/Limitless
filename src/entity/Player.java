@@ -35,6 +35,9 @@ public final class Player extends Entity{
     public final int screenX; // Fixed X position on screen
     public final int screenY; // Fixed Y position on screen
 
+    // Animation state
+    private String animationState = "idle"; // Can be "idle", "walk", or "run"
+
     // Constructor initializes player with game panel and keyboard handler
     public Player (GamePanel gp, KeyHandler keyH){
         this.gp = gp;
@@ -81,146 +84,162 @@ public final class Player extends Entity{
     }
 
     //Extracts a single sprite from the sprite sheet
-    private BufferedImage getSprite(String sheetPath, int row, int col, int spriteWidth, int spriteHeight) {
+    private BufferedImage getSprite(String sheetPath, int row, int col, int spriteWidth, int spriteHeight, int offsetX, int offsetY) {
         try {
             BufferedImage spriteSheet = ImageIO.read(new File(sheetPath));
+            if (spriteSheet == null) {
+                System.err.println("Failed to load sprite sheet: " + sheetPath);
+                return null;
+            }
 
-            // Calculate position in sprite sheet with spacing and offset
-            return spriteSheet.getSubimage(
-                (col * spriteWidth + 9) + (col*25),  // x coordinate with offset and spacing
-                (row * spriteHeight + 14) + (row*13), // y coordinate with offset and spacing
-                spriteWidth,        // width of single sprite
-                spriteHeight        // height of single sprite
-            );
+            int colGap = 30;
+            int rowGap = 10;
+            // Calculate position in sprite sheet with gaps
+            int x = offsetX + col * (spriteWidth + colGap);
+            int y = offsetY + row * (spriteHeight + rowGap);
+
+            // Ensure we don't go out of bounds
+            if (x + spriteWidth > spriteSheet.getWidth() || y + spriteHeight > spriteSheet.getHeight()) {
+                System.err.println("Sprite position out of bounds: " + sheetPath + " at row " + row + ", col " + col);
+                return null;
+            }
+
+            return spriteSheet.getSubimage(x, y, spriteWidth, spriteHeight);
         } catch (IOException e) {
-            return null;         // Return null if error occurs
+            System.err.println("Error loading sprite: " + e.getMessage());
+            return null;
         }
     }
 
-    // Loads all player sprites from the sprite sheet
+    // Helper for idle sprites using exact pixel offsets
+    private BufferedImage getIdleSprite(String sheetPath, int x, int y, int width, int height) {
+        try {
+            BufferedImage spriteSheet = ImageIO.read(new File(sheetPath));
+            if (spriteSheet == null) return null;
+            if (x + width > spriteSheet.getWidth() || y + height > spriteSheet.getHeight()) return null;
+            return spriteSheet.getSubimage(x, y, width, height);
+        } catch (IOException e) {
+            return null;
+        }
+    }
+
+    // Loads all player sprites from the sprite sheets
     public void getPlayerImage() {
         try {
-            
             // Sprite sheet configuration
-            String spriteSheetPath = "res/player/walk.png"; // Path to the sprite sheet
-            int spriteWidth = 39;  // Width of each sprite frame
-            int spriteHeight = 50; // Height of each sprite frame
+            String idleSheetPath = "res/player/idle.png";
+            String walkSheetPath = "res/player/walk.png";
+            String runSheetPath = "res/player/run.png";
+            int walkSpriteWidth = 29;
+            int walkSpriteHeight = 53;
+            int walkOffsetX = 15;
+            int walkOffsetY = 10;
+            int runSpriteWidth = 32;   // Placeholder, update after you provide run details
+            int runSpriteHeight = 32;
+            int runOffsetX = 0;
+            int runOffsetY = 0;
             
-            // Example: Load sprites from specific rows and columns
-            // Parameters: (sheetPath, row, column, width, height)
-            up1 = getSprite(spriteSheetPath, 0, 0, spriteWidth, spriteHeight);    // First row, first column
-            up2 = getSprite(spriteSheetPath, 0, 1, spriteWidth, spriteHeight);    // First row, second column
-            up3 = getSprite(spriteSheetPath, 0, 2, spriteWidth, spriteHeight);    // First row, third column
-            up4 = getSprite(spriteSheetPath, 0, 3, spriteWidth, spriteHeight);    // First row, fourth column
-            up5 = getSprite(spriteSheetPath, 0, 4, spriteWidth, spriteHeight);    // First row, fifth column
-            up6 = getSprite(spriteSheetPath, 0, 5, spriteWidth, spriteHeight);    // First row, sixth column
-            up7 = getSprite(spriteSheetPath, 0, 6, spriteWidth, spriteHeight);    // First row, seventh column
-            up8 = getSprite(spriteSheetPath, 0, 7, spriteWidth, spriteHeight);    // First row, eighth column
-            up9 = getSprite(spriteSheetPath, 0, 8, spriteWidth, spriteHeight);    // First row, ninth column
+            // Load idle animations using exact offsets and 64x64 size
+            up1    = getIdleSprite(idleSheetPath, 0,   0,   64, 64);
+            up2    = getIdleSprite(idleSheetPath, 64,  0,   64, 64);
+            left1  = getIdleSprite(idleSheetPath, 0,   64,  64, 64);
+            left2  = getIdleSprite(idleSheetPath, 64,  64,  64, 64);
+            down1  = getIdleSprite(idleSheetPath, 0,   128, 64, 64);
+            down2  = getIdleSprite(idleSheetPath, 64,  128, 64, 64);
+            right1 = getIdleSprite(idleSheetPath, 0,   192, 64, 64);
+            right2 = getIdleSprite(idleSheetPath, 64,  192, 64, 64);
             
-            left1 = getSprite(spriteSheetPath, 1, 0, spriteWidth, spriteHeight);    // Second row, first column
-            left2 = getSprite(spriteSheetPath, 1, 1, spriteWidth, spriteHeight);    // Second row, second column
-            left3 = getSprite(spriteSheetPath, 1, 2, spriteWidth, spriteHeight);    // Second row, third column
-            left4 = getSprite(spriteSheetPath, 1, 3, spriteWidth, spriteHeight);    // Second row, fourth column
-            left5 = getSprite(spriteSheetPath, 1, 4, spriteWidth, spriteHeight);    // Second row, fifth column
-            left6 = getSprite(spriteSheetPath, 1, 5, spriteWidth, spriteHeight);    // Second row, sixth column
-            left7 = getSprite(spriteSheetPath, 1, 6, spriteWidth, spriteHeight);    // Second row, seventh column
-            left8 = getSprite(spriteSheetPath, 1, 7, spriteWidth, spriteHeight);    // Second row, eighth column
-            left9 = getSprite(spriteSheetPath, 1, 8, spriteWidth, spriteHeight);    // Second row, ninth column
-
-            down1 = getSprite(spriteSheetPath, 2, 0, spriteWidth, spriteHeight);    // Third row, first column
-            down2 = getSprite(spriteSheetPath, 2, 1, spriteWidth, spriteHeight);    // Third row, second column
-            down3 = getSprite(spriteSheetPath, 2, 2, spriteWidth, spriteHeight);    // Third row, third column
-            down4 = getSprite(spriteSheetPath, 2, 3, spriteWidth, spriteHeight);    // Third row, fourth column
-            down5 = getSprite(spriteSheetPath, 2, 4, spriteWidth, spriteHeight);    // Third row, fifth column
-            down6 = getSprite(spriteSheetPath, 2, 5, spriteWidth, spriteHeight);    // Third row, sixth column
-            down7 = getSprite(spriteSheetPath, 2, 6, spriteWidth, spriteHeight);    // Third row, seventh column
-            down8 = getSprite(spriteSheetPath, 2, 7, spriteWidth, spriteHeight);    // Third row, eighth column
-            down9 = getSprite(spriteSheetPath, 2, 8, spriteWidth, spriteHeight);    // Third row, ninth column
+            // Load walk animations
+            up5 = getSprite(walkSheetPath, 0, 0, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            up6 = getSprite(walkSheetPath, 0, 1, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            up7 = getSprite(walkSheetPath, 0, 2, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            up8 = getSprite(walkSheetPath, 0, 3, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            up9 = getSprite(walkSheetPath, 0, 4, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
             
-            right1 = getSprite(spriteSheetPath, 3, 0, spriteWidth, spriteHeight);    // Fourth row, first column
-            right2 = getSprite(spriteSheetPath, 3, 1, spriteWidth, spriteHeight);    // Fourth row, second column
-            right3 = getSprite(spriteSheetPath, 3, 2, spriteWidth, spriteHeight);    // Fourth row, third column
-            right4 = getSprite(spriteSheetPath, 3, 3, spriteWidth, spriteHeight);    // Fourth row, fourth column
-            right5 = getSprite(spriteSheetPath, 3, 4, spriteWidth, spriteHeight);    // Fourth row, fifth column
-            right6 = getSprite(spriteSheetPath, 3, 5, spriteWidth, spriteHeight);    // Fourth row, sixth column
-            right7 = getSprite(spriteSheetPath, 3, 6, spriteWidth, spriteHeight);    // Fourth row, seventh column
-            right8 = getSprite(spriteSheetPath, 3, 7, spriteWidth, spriteHeight);    // Fourth row, eighth column
-            right9 = getSprite(spriteSheetPath, 3, 8, spriteWidth, spriteHeight);    // Fourth row, ninth column
+            left5 = getSprite(walkSheetPath, 1, 0, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            left6 = getSprite(walkSheetPath, 1, 1, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            left7 = getSprite(walkSheetPath, 1, 2, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            left8 = getSprite(walkSheetPath, 1, 3, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            left9 = getSprite(walkSheetPath, 1, 4, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
             
-        } catch (Exception e) {}
+            down5 = getSprite(walkSheetPath, 2, 0, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            down6 = getSprite(walkSheetPath, 2, 1, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            down7 = getSprite(walkSheetPath, 2, 2, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            down8 = getSprite(walkSheetPath, 2, 3, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            down9 = getSprite(walkSheetPath, 2, 4, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            
+            right5 = getSprite(walkSheetPath, 3, 0, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            right6 = getSprite(walkSheetPath, 3, 1, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            right7 = getSprite(walkSheetPath, 3, 2, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            right8 = getSprite(walkSheetPath, 3, 3, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            right9 = getSprite(walkSheetPath, 3, 4, walkSpriteWidth, walkSpriteHeight, walkOffsetX, walkOffsetY);
+            
+            // TODO: Update run loading after you provide its details
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
     
     // Updates player position and animation state based on input
-    public void update(){
+    public void update() {
+        // Always increment spriteCounter
+        spriteCounter++;
         // Don't process movement if in dialogue
         if (gp.gameState == GamePanel.DIALOGUE_STATE) {
             return;
         }
 
         boolean isMoving = keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed;
+        boolean isRunning = keyH.shiftPressed && isMoving;
+        
+        // Update animation state
+        if (!isMoving) {
+            animationState = "idle";
+            if (spriteCounter > 12) {
+                spriteNum = (spriteNum == 1) ? 2 : 1;
+                spriteCounter = 0;
+            }
+        } else if (isRunning) {
+            animationState = "run";
+            // TODO: Clamp spriteNum for run animation after details provided
+        } else {
+            animationState = "walk";
+            if (spriteCounter > 12) {
+                spriteNum = (spriteNum >= 9) ? 5 : spriteNum + 1;
+                spriteCounter = 0;
+            }
+        }
         
         // Only update if movement keys are pressed
-        if(isMoving) {
-            // Update direction and position based on key input
-            if(keyH.upPressed) {
+        if (isMoving) {
+            // Set direction based on key press
+            if (keyH.upPressed) {
                 direction = "up";
-            }
-            if(keyH.downPressed) {
+            } else if (keyH.downPressed) {
                 direction = "down";
-            }
-            if(keyH.leftPressed) {
+            } else if (keyH.leftPressed) {
                 direction = "left";
-            }
-            if(keyH.rightPressed) {
+            } else if (keyH.rightPressed) {
                 direction = "right";
             }
 
-            collisionOn = false; // Reset collision state
-            
             // Check tile collision
+            collisionOn = false;
             gp.cCheck.checkTile(this);
 
+            // Move if no collision
             if (!collisionOn) {
-                // Handle sprinting
-                if (keyH.shiftPressed && gp.hud.canSprint()) {
-                    speed = 8;  // Sprint speed
-                    gp.hud.drainStamina();
-                } else {
-                    speed = 4;   // Normal speed
-                }
-                
-                // Move the player
-                switch(direction) {
-                    case "up" -> worldY -= speed;
-                    case "down" -> worldY += speed;
-                    case "left" -> worldX -= speed;
-                    case "right" -> worldX += speed;
-                }
-                
-                // Only update animation if actually moving
-                spriteCounter++;
-                if (spriteCounter > 12) {
-                    if (spriteNum == 1) {
-                        spriteNum = 2;
-                    } else if (spriteNum == 2) {
-                        spriteNum = 3;
-                    } else if (spriteNum == 3) {
-                        spriteNum = 4;
-                    } else {
-                        spriteNum = 1;
-                    }
-                    spriteCounter = 0;
+                int moveSpeed = isRunning ? speed * 2 : speed;
+                switch (direction) {
+                    case "up" -> worldY -= moveSpeed;
+                    case "down" -> worldY += moveSpeed;
+                    case "left" -> worldX -= moveSpeed;
+                    case "right" -> worldX += moveSpeed;
                 }
             }
-        } else {
-            // Reset animation when not moving
-            spriteNum = 1;
-            spriteCounter = 0;
         }
         
         // Update stamina
-        gp.hud.regenerateStamina(isMoving);
         stamina = gp.hud.getStamina();
         
         // Update HUD
@@ -231,141 +250,40 @@ public final class Player extends Entity{
     // Draws the player with current sprite based on direction and animation frame
     public void draw(Graphics2D g2){
         BufferedImage image = null;
-        
-        // Select correct sprite based on direction and animation frame
-        switch(direction){
-            case "up":
-                switch (spriteNum) {
-                    case 1:
-                        image = up1;
+        switch (animationState) {
+            case "idle":
+                // Only 2 frames per direction for idle
+                if (direction.equals("up")) {
+                    image = (spriteNum == 2) ? up2 : up1;
+                } else if (direction.equals("down")) {
+                    image = (spriteNum == 2) ? down2 : down1;
+                } else if (direction.equals("left")) {
+                    image = (spriteNum == 2) ? left2 : left1;
+                } else if (direction.equals("right")) {
+                    image = (spriteNum == 2) ? right2 : right1;
+                }
+                break;
+            case "walk":
+                switch(direction){
+                    case "up":
+                        image = (spriteNum == 5) ? up5 : (spriteNum == 6) ? up6 : (spriteNum == 7) ? up7 : (spriteNum == 8) ? up8 : up9;
                         break;
-                    case 2:
-                        image = up2;
+                    case "down":
+                        image = (spriteNum == 5) ? down5 : (spriteNum == 6) ? down6 : (spriteNum == 7) ? down7 : (spriteNum == 8) ? down8 : down9;
                         break;
-                    case 3:
-                        image = up3;
+                    case "left":
+                        image = (spriteNum == 5) ? left5 : (spriteNum == 6) ? left6 : (spriteNum == 7) ? left7 : (spriteNum == 8) ? left8 : left9;
                         break;
-                    case 4:
-                        image = up4;
-                        break;
-                    case 5:
-                        image = up5;
-                        break;
-                    case 6:
-                        image = up6;
-                        break;
-                    case 7:
-                        image = up7;
-                        break;
-                    case 8:
-                        image = up8;
-                        break;
-                    case 9:
-                        image = up9;
+                    case "right":
+                        image = (spriteNum == 5) ? right5 : (spriteNum == 6) ? right6 : (spriteNum == 7) ? right7 : (spriteNum == 8) ? right8 : right9;
                         break;
                 }
                 break;
-
-            case "down":
-                switch (spriteNum) {
-                    case 1:
-                        image = down1;
-                        break;
-                    case 2:
-                        image = down2;
-                        break;
-                    case 3:
-                        image = down3;
-                        break;
-                    case 4:
-                        image = down4;
-                        break;
-                    case 5:
-                        image = down5;
-                        break;
-                    case 6:
-                        image = down6;
-                        break;
-                    case 7:
-                        image = down7;
-                        break;
-                    case 8:
-                        image = down8;
-                        break;
-                    case 9:
-                        image = down9;
-                        break;
-                }
-                break;
-
-            case "left":
-                switch (spriteNum) {
-                    case 1:
-                        image = left1;
-                        break;
-                    case 2:
-                        image = left2;
-                        break;
-                    case 3:
-                        image = left3;
-                        break;
-                    case 4:
-                        image = left4;
-                        break;
-                    case 5:
-                        image = left5;
-                        break;
-                    case 6:
-                        image = left6;
-                        break;
-                    case 7:
-                        image = left7;
-                        break;
-                    case 8:
-                        image = left8;
-                        break;
-                    case 9:
-                        image = left9;
-                        break;
-                }
-                break;
-
-            case "right":
-                switch (spriteNum) {
-                    case 1:
-                        image = right1;
-                        break;
-                    case 2:
-                        image = right2;
-                        break;
-                    case 3:
-                        image = right3;
-                        break;
-                    case 4:
-                        image = right4;
-                        break;
-                    case 5:
-                        image = right5;
-                        break;
-                    case 6:
-                        image = right6;
-                        break;
-                    case 7:
-                        image = right7;
-                        break;
-                    case 8:
-                        image = right8;
-                        break;
-                    case 9:
-                        image = right9;
-                        break;
-                }
+            case "run":
+                image = null;
                 break;
         }
-
-        
-        
-        // Draw the player sprite at screen position
+        // Draw the player sprite at screen position and scale to tile size
         g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
     }
 }

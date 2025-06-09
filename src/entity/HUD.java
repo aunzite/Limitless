@@ -18,15 +18,15 @@ public class HUD {
     // Stamina system
     private static final int MAX_STAMINA = 1000;  // Internal max stamina
     private static final int DISPLAY_MAX_STAMINA = 100;  // Display max stamina
-    private static final int STAMINA_DRAIN_RATE = 15;  // 1.5% drain per frame
-    private static final int STAMINA_REGEN_RATE = 10;  // 1% regen per frame while idle
-    private static final int STAMINA_WALK_REGEN_RATE = 5;  // 0.5% regen per frame while walking
+    private static final int STAMINA_DRAIN_RATE = 10;  // 1% drain per frame
+    private static final int STAMINA_REGEN_RATE = 5;  // Reduced from 15 to 5 (0.5% regen per frame while idle)
+    private static final int STAMINA_WALK_REGEN_RATE = 3;  // Reduced from 8 to 3 (0.3% regen per frame while walking)
     private boolean isInCooldown = false;
     private long lastStaminaDrainTime = 0;
-    private static final int COOLDOWN_TIME = 1000; // 1 second cooldown
+    private static final int COOLDOWN_TIME = 500; // 0.5 second cooldown
     private boolean wasShiftPressed = false;  // Track previous frame's shift state
     private long lastShiftReleaseTime = 0;    // Track when shift was released
-    private static final int SHIFT_COOLDOWN = 1000; // 1 second cooldown after releasing shift
+    private static final int SHIFT_COOLDOWN = 300; // 0.3 second cooldown after releasing shift
     
     // UI Constants
     private static final int BAR_WIDTH = 400;

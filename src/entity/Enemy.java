@@ -1,4 +1,4 @@
-// Blank enemy class to be filled when sprite and behavior are ready (Ahmed)
+// Blank enemy class to be filled when sprite and behavior are ready 
 
 package entity;
 

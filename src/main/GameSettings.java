@@ -15,6 +15,7 @@ public class GameSettings {
     // Settings
     private float brightness = 1.0f;
     private float contrast = 1.0f;
+    private boolean autoSaveEnabled = true;
     private Map<String, Integer> keybinds;
     
     private GameSettings() {
@@ -50,6 +51,15 @@ public class GameSettings {
         saveSettings();
     }
     
+    public void setAutoSaveEnabled(boolean enabled) {
+        this.autoSaveEnabled = enabled;
+        saveSettings();
+    }
+    
+    public boolean isAutoSaveEnabled() {
+        return autoSaveEnabled;
+    }
+    
     public void setKeybind(String action, int keyCode) {
         keybinds.put(action, keyCode);
         saveSettings();
@@ -75,6 +85,7 @@ public class GameSettings {
         try (PrintWriter writer = new PrintWriter(new FileWriter(SETTINGS_FILE))) {
             writer.println("brightness=" + brightness);
             writer.println("contrast=" + contrast);
+            writer.println("autosave=" + autoSaveEnabled);
             for (Map.Entry<String, Integer> entry : keybinds.entrySet()) {
                 writer.println("keybind:" + entry.getKey() + "=" + entry.getValue());
             }
@@ -102,6 +113,8 @@ public class GameSettings {
                     brightness = Float.parseFloat(value);
                 } else if (key.equals("contrast")) {
                     contrast = Float.parseFloat(value);
+                } else if (key.equals("autosave")) {
+                    autoSaveEnabled = Boolean.parseBoolean(value);
                 } else if (key.startsWith("keybind:")) {
                     String action = key.substring(8);
                     keybinds.put(action, Integer.parseInt(value));
