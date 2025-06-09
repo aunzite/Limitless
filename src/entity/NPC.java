@@ -28,7 +28,7 @@ public class NPC extends Entity {
     private int speed;
     private int spriteCounter = 0;
     private int spriteNum = 1;
-    private BufferedImage up1, up2, up3, up4, down1, down2, down3, down4, left1, left2, left3, left4, right1, right2, right3, right4;
+    private BufferedImage up1, up2, up3, up4, up5, up6, up7, up8, up9, down1, down2, down3, down4, down5, down6, down7, down8, down9, left1, left2, left3, left4, left5, left6, left7, left8, left9, right1, right2, right3, right4, right5, right6, right7, right8, right9;
     public boolean inRange = false;
     private boolean hasGivenSword = false;
     private int dialogueState = 0;
@@ -49,7 +49,8 @@ public class NPC extends Entity {
         // Initialize Entity fields
         direction = "down";  // Initialize the inherited direction field
         this.speed = 1;  // Set a reasonable speed for NPC movement
-        this.playerHitbox = new Rectangle(8, 16, 32, 32); // Match player hitbox size
+        // Hitbox: exactly matches player
+        this.playerHitbox = new Rectangle(24, 0, 32, 88);
         this.collisionOn = false;
         
         // Initialize NPC specific fields
@@ -70,61 +71,57 @@ public class NPC extends Entity {
         try {
             // Sprite sheet configuration
             String spriteSheetPath = "res/elaria/walk.png";
-            int spriteWidth = 39;
-            int spriteHeight = 50;
             
             BufferedImage spriteSheet = ImageIO.read(new File(spriteSheetPath));
             if (spriteSheet == null) {
                 throw new IOException("Failed to load sprite sheet");
             }
             
-            // Load all sprites in a more efficient way
-            for (int row = 0; row < 4; row++) {
-                for (int col = 0; col < 4; col++) {
-                    BufferedImage sprite = spriteSheet.getSubimage(
-                        (col * spriteWidth + 9) + (col*25),
-                        (row * spriteHeight + 14) + (row*13),
-                        spriteWidth,
-                        spriteHeight
-                    );
-                    
-                    // Assign sprite to appropriate variable based on row and column
-                    switch(row) {
-                        case 0 -> {
-                            switch(col) {
-                                case 0 -> up1 = sprite;
-                                case 1 -> up2 = sprite;
-                                case 2 -> up3 = sprite;
-                                case 3 -> up4 = sprite;
-                            }
-                        }
-                        case 1 -> {
-                            switch(col) {
-                                case 0 -> left1 = sprite;
-                                case 1 -> left2 = sprite;
-                                case 2 -> left3 = sprite;
-                                case 3 -> left4 = sprite;
-                            }
-                        }
-                        case 2 -> {
-                            switch(col) {
-                                case 0 -> down1 = sprite;
-                                case 1 -> down2 = sprite;
-                                case 2 -> down3 = sprite;
-                                case 3 -> down4 = sprite;
-                            }
-                        }
-                        case 3 -> {
-                            switch(col) {
-                                case 0 -> right1 = sprite;
-                                case 1 -> right2 = sprite;
-                                case 2 -> right3 = sprite;
-                                case 3 -> right4 = sprite;
-                            }
-                        }
-                    }
-                }
-            }
+            // Load all sprites using exact pixel offsets
+            // Up (row 1)
+            up1 = spriteSheet.getSubimage(0, 0, 64, 64);
+            up2 = spriteSheet.getSubimage(64, 0, 64, 64);
+            up3 = spriteSheet.getSubimage(128, 0, 64, 64);
+            up4 = spriteSheet.getSubimage(192, 0, 64, 64);
+            up5 = spriteSheet.getSubimage(256, 0, 64, 64);
+            up6 = spriteSheet.getSubimage(320, 0, 64, 64);
+            up7 = spriteSheet.getSubimage(384, 0, 64, 64);
+            up8 = spriteSheet.getSubimage(448, 0, 64, 64);
+            up9 = spriteSheet.getSubimage(512, 0, 64, 64);
+            
+            // Left (row 2)
+            left1 = spriteSheet.getSubimage(0, 64, 64, 64);
+            left2 = spriteSheet.getSubimage(64, 64, 64, 64);
+            left3 = spriteSheet.getSubimage(128, 64, 64, 64);
+            left4 = spriteSheet.getSubimage(192, 64, 64, 64);
+            left5 = spriteSheet.getSubimage(256, 64, 64, 64);
+            left6 = spriteSheet.getSubimage(320, 64, 64, 64);
+            left7 = spriteSheet.getSubimage(384, 64, 64, 64);
+            left8 = spriteSheet.getSubimage(448, 64, 64, 64);
+            left9 = spriteSheet.getSubimage(512, 64, 64, 64);
+            
+            // Down (row 3)
+            down1 = spriteSheet.getSubimage(0, 128, 64, 64);
+            down2 = spriteSheet.getSubimage(64, 128, 64, 64);
+            down3 = spriteSheet.getSubimage(128, 128, 64, 64);
+            down4 = spriteSheet.getSubimage(192, 128, 64, 64);
+            down5 = spriteSheet.getSubimage(256, 128, 64, 64);
+            down6 = spriteSheet.getSubimage(320, 128, 64, 64);
+            down7 = spriteSheet.getSubimage(384, 128, 64, 64);
+            down8 = spriteSheet.getSubimage(448, 128, 64, 64);
+            down9 = spriteSheet.getSubimage(512, 128, 64, 64);
+            
+            // Right (row 4)
+            right1 = spriteSheet.getSubimage(0, 192, 64, 64);
+            right2 = spriteSheet.getSubimage(64, 192, 64, 64);
+            right3 = spriteSheet.getSubimage(128, 192, 64, 64);
+            right4 = spriteSheet.getSubimage(192, 192, 64, 64);
+            right5 = spriteSheet.getSubimage(256, 192, 64, 64);
+            right6 = spriteSheet.getSubimage(320, 192, 64, 64);
+            right7 = spriteSheet.getSubimage(384, 192, 64, 64);
+            right8 = spriteSheet.getSubimage(448, 192, 64, 64);
+            right9 = spriteSheet.getSubimage(512, 192, 64, 64);
+            
         } catch (IOException e) {
             System.err.println("Error loading NPC sprites: " + e.getMessage());
             e.printStackTrace();
@@ -133,7 +130,7 @@ public class NPC extends Entity {
 
     private void loadStory() {
         try {
-            List<String> lines = Files.readAllLines(Paths.get("src/dialogue/elaria.txt"));
+            List<String> lines = Files.readAllLines(Paths.get("res/dialogue/elaria.txt"));
             StringBuilder paragraph = new StringBuilder();
             for (String line : lines) {
                 if (line.trim().isEmpty()) {
@@ -309,10 +306,17 @@ public class NPC extends Entity {
     public void draw(Graphics2D g2) {
         BufferedImage image = getCurrentSprite();
         
-        // Draw the NPC
+        // Calculate screen position
         int screenX = worldX - gp.player.worldX + gp.player.screenX;
         int screenY = worldY - gp.player.worldY + gp.player.screenY;
-        g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+        
+        // Draw the NPC at 1.3x the tile size, feet aligned
+        double scale = 1.3;
+        int drawWidth = (int)(gp.tileSize * scale);
+        int drawHeight = (int)(gp.tileSize * scale);
+        int drawX = screenX - (drawWidth - gp.tileSize) / 2;
+        int drawY = screenY - (drawHeight - gp.tileSize);
+        g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
 
         // Draw interaction message if player is in range
         if (inRange) {
@@ -331,6 +335,11 @@ public class NPC extends Entity {
                 case 2 -> up2;
                 case 3 -> up3;
                 case 4 -> up4;
+                case 5 -> up5;
+                case 6 -> up6;
+                case 7 -> up7;
+                case 8 -> up8;
+                case 9 -> up9;
                 default -> up1;
             };
             case "down" -> switch(spriteNum) {
@@ -338,6 +347,11 @@ public class NPC extends Entity {
                 case 2 -> down2;
                 case 3 -> down3;
                 case 4 -> down4;
+                case 5 -> down5;
+                case 6 -> down6;
+                case 7 -> down7;
+                case 8 -> down8;
+                case 9 -> down9;
                 default -> down1;
             };
             case "left" -> switch(spriteNum) {
@@ -345,6 +359,11 @@ public class NPC extends Entity {
                 case 2 -> left2;
                 case 3 -> left3;
                 case 4 -> left4;
+                case 5 -> left5;
+                case 6 -> left6;
+                case 7 -> left7;
+                case 8 -> left8;
+                case 9 -> left9;
                 default -> left1;
             };
             case "right" -> switch(spriteNum) {
@@ -352,6 +371,11 @@ public class NPC extends Entity {
                 case 2 -> right2;
                 case 3 -> right3;
                 case 4 -> right4;
+                case 5 -> right5;
+                case 6 -> right6;
+                case 7 -> right7;
+                case 8 -> right8;
+                case 9 -> right9;
                 default -> right1;
             };
             default -> down1;

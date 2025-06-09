@@ -20,7 +20,10 @@ public class SuperObject {
            worldX - gp.tileSize < gp.player.worldX + gp.player.screenX &&
            worldY + gp.tileSize > gp.player.worldY - gp.player.screenY &&
            worldY - gp.tileSize < gp.player.worldY + gp.player.screenY) {
-            g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+            // Draw at half tile size, centered
+            int size = gp.tileSize / 2;
+            int offset = (gp.tileSize - size) / 2;
+            g2.drawImage(image, screenX + offset, screenY + offset, size, size, null);
         }
     }
 }   
