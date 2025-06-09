@@ -17,6 +17,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.awt.FontMetrics;
+import entity.Item;
 
 public class NPC extends Entity {
     GamePanel gp;
@@ -202,6 +203,8 @@ public class NPC extends Entity {
                 String command = weaponCommand.substring(1, weaponCommand.length() - 1);
                 String weaponName = command.substring(8).replace("\"", "").trim();
                 gp.player.weapon = new Weapon(weaponName, 25, 1.0, "sword");
+                // Add Solthorn object to inventory as an Item
+                gp.player.inventory.addItem(new Item("Solthorn", "res/object/solthorn.png", 1));
                 hasGivenSword = true;
             }
             return;

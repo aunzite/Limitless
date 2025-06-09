@@ -210,6 +210,16 @@ public class Inventory {
                             }
                         }
                     }
+                } else if (item.getName().equalsIgnoreCase("Solthorn")) {
+                    object.OBJ_Solthorn droppedSolthorn = new object.OBJ_Solthorn();
+                    droppedSolthorn.worldX = gp.player.worldX;
+                    droppedSolthorn.worldY = gp.player.worldY;
+                    for (int i = 0; i < gp.obj.length; i++) {
+                        if (gp.obj[i] == null) {
+                            gp.obj[i] = droppedSolthorn;
+                            break;
+                        }
+                    }
                 }
                 items[contextMenuRow][contextMenuCol] = null;
                 closeMenus();
@@ -347,6 +357,12 @@ public class Inventory {
         String[] descLines;
         if (item.getName().toLowerCase().contains("apple")) {
             descLines = new String[]{"A fresh, juicy apple that restores your vitality.", "Effect: Restores 20 health and 15 stamina."};
+        } else if (item.getName().equalsIgnoreCase("Solthorn")) {
+            descLines = new String[]{
+                "A legendary blade passed down through",
+                "Elaria's bloodline, forged around a gem said",
+                "to hold unimaginable power."
+            };
         } else if (item.getName().toLowerCase().contains("sword")) {
             descLines = new String[]{"Type: Weapon", "(More info here...)"};
         } else {

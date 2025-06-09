@@ -110,6 +110,7 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         tileM = new TileManager(this);
         cCheck = new CollisionChecker(this);
         player = new Player(this, keyH);
+        player.weapon = null;
         npc = new NPC(this, keyH);
         dialogue = new Dialogue(this);
         aSetter = new AssetSetter(this);
@@ -311,18 +312,27 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         
         // Draw objects and check for nearby items
         String nearbyItemDesc = null;
+        boolean nearApple = false, nearSolthorn = false;
+        int solthornScreenX = -1, solthornScreenY = -1, solthornObjIndex = -1;
+        int solthornQuantity = 1; // For future-proofing, but Solthorn is unique
         for(int i = 0; i < obj.length; i++) {
             if(obj[i] != null) {
                 obj[i].draw(g2, this);
-                
                 // Check if player is near this item
                 int distance = (int) Math.sqrt(
                     Math.pow(obj[i].worldX - player.worldX, 2) + 
                     Math.pow(obj[i].worldY - player.worldY, 2)
                 );
-                if (distance < tileSize * 2) { // Within 2 tiles
+                if (distance < tileSize * 2) {
                     if (obj[i] instanceof object.OBJ_Apple) {
                         nearbyItemDesc = ((object.OBJ_Apple)obj[i]).getDescription();
+                        nearApple = true;
+                    } else if (obj[i] instanceof object.OBJ_Solthorn) {
+                        nearbyItemDesc = ((object.OBJ_Solthorn)obj[i]).getDescription();
+                        nearSolthorn = true;
+                        solthornScreenX = obj[i].worldX - player.worldX + player.screenX;
+                        solthornScreenY = obj[i].worldY - player.worldY + player.screenY;
+                        solthornObjIndex = i;
                     }
                 }
             }
@@ -346,7 +356,7 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         }
         
         int appleScreenX = -1, appleScreenY = -1, appleObjIndex = -1, appleQuantity = 1;
-        if (nearbyItemDesc != null) {
+        if (nearApple) {
             // Find the apple's screen position and index
             for(int i = 0; i < obj.length; i++) {
                 if(obj[i] != null && obj[i] instanceof object.OBJ_Apple) {
@@ -364,22 +374,18 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
                 }
             }
         }
-        // Draw item description if near an item
-        if (nearbyItemDesc != null && appleScreenX != -1 && appleScreenY != -1) {
+        if (nearApple && appleScreenX != -1 && appleScreenY != -1) {
             int w = 340;
             int h = 160;
             int size = tileSize / 2;
-            // Move the box further up and right
-            int x = appleScreenX + size + 32; // more right
-            int y = appleScreenY - h + 10; // more up
-            // Clamp to screen bounds
+            int x = appleScreenX + size + 32;
+            int y = appleScreenY - h + 10;
             if (x + w > screenWidth) x = screenWidth - w - 10;
             if (y < 10) y = 10;
             if (y + h > screenHeight) y = screenHeight - h - 10;
             String name = "Apple";
             String[] lines = {"A fresh, juicy apple that restores your vitality.", "Effect: Restores 20 health and 15 stamina."};
             entity.Inventory.drawDetailsPopupBox(g2, x, y, w, h, name, lines, appleQuantity);
-            // Draw fading 'Press e to pick up' at the bottom of the box
             float alpha = (float)(0.5 + 0.5 * Math.sin(System.currentTimeMillis() / 400.0));
             g2.setFont(g2.getFont().deriveFont(Font.ITALIC, 16f));
             g2.setColor(new Color(255,255,255,(int)(220*alpha)));
@@ -388,12 +394,40 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
             int msgX = x + (w - msgWidth) / 2;
             int msgY = y + h - 18;
             g2.drawString(pickupMsg, msgX, msgY);
-            // Handle E key for pickup
             if (keyH.ePressed && canPickup && appleObjIndex != -1) {
-                // Add all apples to inventory (stack)
                 int qty = ((object.OBJ_Apple)obj[appleObjIndex]).quantity;
                 player.inventory.addItem(new entity.OBJ_Apple(qty));
                 obj[appleObjIndex] = null;
+                canPickup = false;
+            }
+            if (!keyH.ePressed) {
+                canPickup = true;
+            }
+        } else if (nearSolthorn && solthornScreenX != -1 && solthornScreenY != -1) {
+            int w = 340;
+            int h = 160;
+            int size = tileSize / 2;
+            int x = solthornScreenX + size + 32;
+            int y = solthornScreenY - h + 10;
+            if (x + w > screenWidth) x = screenWidth - w - 10;
+            if (y < 10) y = 10;
+            if (y + h > screenHeight) y = screenHeight - h - 10;
+            String name = "Solthorn";
+            String[] lines = {"A legendary blade passed down through",
+                "Elaria's bloodline, forged around a gem said",
+                "to hold unimaginable power."};
+            entity.Inventory.drawDetailsPopupBox(g2, x, y, w, h, name, lines, solthornQuantity);
+            float alpha = (float)(0.5 + 0.5 * Math.sin(System.currentTimeMillis() / 400.0));
+            g2.setFont(g2.getFont().deriveFont(Font.ITALIC, 16f));
+            g2.setColor(new Color(255,255,255,(int)(220*alpha)));
+            String pickupMsg = "Press e to pick up";
+            int msgWidth = g2.getFontMetrics().stringWidth(pickupMsg);
+            int msgX = x + (w - msgWidth) / 2;
+            int msgY = y + h - 18;
+            g2.drawString(pickupMsg, msgX, msgY);
+            if (keyH.ePressed && canPickup && solthornObjIndex != -1) {
+                player.inventory.addItem(new entity.Item("Solthorn", "res/object/solthorn.png", 1));
+                obj[solthornObjIndex] = null;
                 canPickup = false;
             }
             if (!keyH.ePressed) {

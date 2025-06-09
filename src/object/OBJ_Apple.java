@@ -13,7 +13,7 @@ public class OBJ_Apple extends SuperObject {
         name = "Apple";
         this.quantity = quantity;
         try {
-            image = ImageIO.read(new File("res/inventory/apple.png"));
+            image = ImageIO.read(new File("res/object/apple.png"));
         } catch (Exception e) {
             e.printStackTrace();
         }
