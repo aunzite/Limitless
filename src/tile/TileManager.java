@@ -42,24 +42,48 @@ public final class TileManager {
             tile[0] = new Tile();
             tile[0].image = ImageIO.read(new File("res/tiles/grass.png"));
 
-            // Index 1: Path
+            // Index 1: Grass2
             tile[1] = new Tile();
-            tile[1].image = ImageIO.read(new File("res/tiles/path.png"));
+            tile[1].image = ImageIO.read(new File("res/tiles/grass2.png"));
 
-            // Index 2: Water
+            // Index 2: Path
             tile[2] = new Tile();
-            tile[2].image = ImageIO.read(new File("res/tiles/water.png"));
-            tile[2].collision = true; //Collsion added to this texutre.
-
-            // Index 3: Tree
-            tile[3] = new Tile();
-            tile[3].image = ImageIO.read(new File("res/tiles/tree.png"));
-            tile[3].collision = true; //Collsion added to this texutre.
+            tile[2].image = ImageIO.read(new File("res/tiles/path.png"));
 
             // Index 3: Ruin
+            tile[3] = new Tile();
+            tile[3].image = ImageIO.read(new File("res/tiles/ruin.png"));
+            tile[3].collision = true; //Collsion added to this texutre.
+
+            // Index 4: Shrine BL
             tile[4] = new Tile();
-            tile[4].image = ImageIO.read(new File("res/tiles/ruin.png"));
+            tile[4].image = ImageIO.read(new File("res/tiles/shrine_bottom_left.png"));
             tile[4].collision = true; //Collsion added to this texutre.
+
+            // Index 5: Shrine BR
+            tile[5] = new Tile();
+            tile[5].image = ImageIO.read(new File("res/tiles/shrine_bottom_right.png"));
+            tile[5].collision = true; //Collsion added to this texutre.
+
+            // Index 6: Shrine TL
+            tile[6] = new Tile();
+            tile[6].image = ImageIO.read(new File("res/tiles/shrine_top_left.png"));
+            tile[6].collision = true; //Collsion added to this texutre.
+
+            // Index 7: Shrine TR
+            tile[7] = new Tile();
+            tile[7].image = ImageIO.read(new File("res/tiles/shrine_top_right.png"));
+            tile[7].collision = true; //Collsion added to this texutre.
+
+            // Index 8: Tree
+            tile[8] = new Tile();
+            tile[8].image = ImageIO.read(new File("res/tiles/tree.png"));
+            tile[8].collision = true; //Collsion added to this texutre.
+
+            //Index 9: Water
+            tile[9] = new Tile();
+            tile[9].image = ImageIO.read(new File("res/tiles/water.png"));
+            tile[9].collision = true; //Collsion added to this texutre.
 
         } catch (IOException e) {}
     }

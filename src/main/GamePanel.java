@@ -14,17 +14,17 @@ package main;
 
 import entity.*;
 import java.awt.*;
-import javax.swing.JPanel;
-import javax.swing.JFrame;
-import object.SuperObject;
-import tile.TileManager;
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import object.SuperObject;
+import tile.TileManager;
 
 // Main game panel class that handles the game loop, rendering and updates
 // Extends JPanel for GUI functionality and implements Runnable for the game loop
@@ -37,7 +37,7 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
     
     // World Settings
     public final int maxWorldCol = 69;                       // Total number of columns in world map
-    public final int maxWorldRow = 39;                       // Total number of rows in world map
+    public final int maxWorldRow = 68;                       // Total number of rows in world map
     public final int worldWidth = tileSize * maxWorldCol;    // Total world width in pixels
     public final int worldHeight = tileSize * maxWorldRow;   // Total world height in pixels
 
