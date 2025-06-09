@@ -168,13 +168,8 @@ public class Menu implements MouseListener, MouseMotionListener {
             g2.setColor(new Color(0, 0, 0, 150));
             g2.drawString(option, optionX + 2, optionY + 2);
             
-            // Highlight selected or hovered option
-            if (i == selectedOption || i == hoveredOption) {
-                g2.setColor(new Color(255, 255, 0, 255));
-            } else {
-                g2.setColor(Color.WHITE);
-            }
-            
+            // Always use white color for options
+            g2.setColor(Color.WHITE);
             g2.drawString(option, optionX, optionY);
             
             // Restore the original transform

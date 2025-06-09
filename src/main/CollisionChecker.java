@@ -46,48 +46,68 @@ public class CollisionChecker {
                 entityTopRow = (entityTopWorldY - entity.speed)/gp.tileSize;
                 if (entityTopRow < 0) {
                     entity.collisionOn = true;
+                    if (entity instanceof entity.Player p) p.setLastCollisionTile(entityLeftCol, entityTopRow);
                     return;
                 }
                 tileNum1 = gp.tileM.mapTileNum[entityLeftCol][entityTopRow];
                 tileNum2 = gp.tileM.mapTileNum[entityRightCol][entityTopRow];
                 if(gp.tileM.tile[tileNum1].collision || gp.tileM.tile[tileNum2].collision) {
                     entity.collisionOn = true;
+                    if (entity instanceof entity.Player p) {
+                        p.setLastCollisionTile(entityLeftCol, entityTopRow);
+                        p.setLastCollisionTile(entityRightCol, entityTopRow);
+                    }
                 }
             }
             case "down" -> {
                 entityBotRow = (entityBotWorldY + entity.speed)/gp.tileSize;
                 if (entityBotRow >= gp.maxWorldRow) {
                     entity.collisionOn = true;
+                    if (entity instanceof entity.Player p) p.setLastCollisionTile(entityLeftCol, entityBotRow);
                     return;
                 }
                 tileNum1 = gp.tileM.mapTileNum[entityLeftCol][entityBotRow];
                 tileNum2 = gp.tileM.mapTileNum[entityRightCol][entityBotRow];
                 if(gp.tileM.tile[tileNum1].collision || gp.tileM.tile[tileNum2].collision) {
                     entity.collisionOn = true;
+                    if (entity instanceof entity.Player p) {
+                        p.setLastCollisionTile(entityLeftCol, entityBotRow);
+                        p.setLastCollisionTile(entityRightCol, entityBotRow);
+                    }
                 }
             }
             case "left" -> {
                 entityLeftCol = (entityLeftWorldX - entity.speed)/gp.tileSize;
                 if (entityLeftCol < 0) {
                     entity.collisionOn = true;
+                    if (entity instanceof entity.Player p) p.setLastCollisionTile(entityLeftCol, entityTopRow);
                     return;
                 }
                 tileNum1 = gp.tileM.mapTileNum[entityLeftCol][entityTopRow];
                 tileNum2 = gp.tileM.mapTileNum[entityLeftCol][entityBotRow];
                 if(gp.tileM.tile[tileNum1].collision || gp.tileM.tile[tileNum2].collision) {
                     entity.collisionOn = true;
+                    if (entity instanceof entity.Player p) {
+                        p.setLastCollisionTile(entityLeftCol, entityTopRow);
+                        p.setLastCollisionTile(entityLeftCol, entityBotRow);
+                    }
                 }
             }
             case "right" -> {
                 entityRightCol = (entityRightWorldX + entity.speed)/gp.tileSize;
                 if (entityRightCol >= gp.maxWorldCol) {
                     entity.collisionOn = true;
+                    if (entity instanceof entity.Player p) p.setLastCollisionTile(entityRightCol, entityTopRow);
                     return;
                 }
                 tileNum1 = gp.tileM.mapTileNum[entityRightCol][entityTopRow];
                 tileNum2 = gp.tileM.mapTileNum[entityRightCol][entityBotRow];
                 if(gp.tileM.tile[tileNum1].collision || gp.tileM.tile[tileNum2].collision) {
                     entity.collisionOn = true;
+                    if (entity instanceof entity.Player p) {
+                        p.setLastCollisionTile(entityRightCol, entityTopRow);
+                        p.setLastCollisionTile(entityRightCol, entityBotRow);
+                    }
                 }
             }
         }
