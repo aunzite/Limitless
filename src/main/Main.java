@@ -24,7 +24,7 @@ public class Main {
         JFrame window = new JFrame();                              // Create window container
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);     // Enable proper program termination
         window.setResizable(false);                                // Lock window size
-        window.setTitle("2D Adventure");                           // Set window title bar text
+        window.setTitle("Limitless");                           // Set window title bar text
 
         // Initialize game components
         GamePanel gamePanel = new GamePanel(window);               // Create main game panel with window reference
