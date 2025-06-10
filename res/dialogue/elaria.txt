@@ -24,6 +24,6 @@ Elaria:
 
 "Use F5, F6, and F7 to save, load, or erase your progress."
 
-"And keep an eye on your stamina. You'll tire fast if you swing without purpose."
+"And keep an eye on your stamina."
 
 "Go east, past the ruins. His first minion nests there—one of many. Defeat them all… and bring light back to our world."
