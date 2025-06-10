@@ -1,6 +1,6 @@
 brightness=0.77
 contrast=0.2
-autosave=true
+autosave=false
 keybind:left=65
 keybind:sprint=16
 keybind:interact=69

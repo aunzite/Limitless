@@ -44,6 +44,7 @@ public class Inventory {
 
     public void toggle() { isOpen = !isOpen; closeMenus(); }
     public boolean isOpen() { return isOpen; }
+    public void setOpen(boolean open) { this.isOpen = open; closeMenus(); }
 
     public void addItem(Item item) {
         // Stack apples if possible

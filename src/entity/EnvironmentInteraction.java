@@ -112,7 +112,39 @@ public class EnvironmentInteraction {
                     // End dialogue
                     inDialogue = false;
                     currentParagraph = 0;
-                    gp.gameState = GamePanel.PLAY_STATE;
+                    
+                    // Special handling for shrine entry
+                    if (interactionName.equals("Ancient Shrine")) {
+                        // Calculate platform position
+                        int platformX = (gp.screenWidth - (16 * gp.tileSize)) / 2;
+                        int platformY = (gp.screenHeight - (8 * gp.tileSize)) / 2;
+                        
+                        // Set player position at left edge of platform
+                        gp.player.worldX = platformX + gp.tileSize;  // One tile from left edge
+                        gp.player.worldY = platformY + (4 * gp.tileSize);  // Center vertically
+                        gp.player.direction = "right";
+                        gp.player.inventory.setOpen(false); // Force inventory closed
+                        // Ensure sword textures are set if player has a sword
+                        if (gp.player.weapon != null && gp.player.weapon.getName().toLowerCase().contains("sword")) {
+                            gp.player.setSwordTextures(true);
+                        } else {
+                            gp.player.setSwordTextures(false);
+                        }
+                        // Play battle music (will be started after cutscene)
+                        main.AudioManager.getInstance().stopMusic();
+                        // Spawn Noxar at the correct position, frozen
+                        int bossX = platformX + (int)(16 * gp.tileSize * 0.75);
+                        int bossY = platformY + (8 * gp.tileSize) / 2 - 64;
+                        gp.bossNoxar = new entity.BossNoxar(bossX, bossY);
+                        gp.bossNoxar.direction = "left";
+                        // Start Noxar cutscene
+                        gp.noxarCutsceneIndex = 0;
+                        gp.inNoxarCutscene = true;
+                        gp.gameState = main.GamePanel.NOXAR_CUTSCENE_STATE;
+                    } else {
+                        gp.gameState = GamePanel.PLAY_STATE;
+                    }
+                    
                     lastInteractionTime = System.currentTimeMillis();  // Set cooldown when dialogue actually ends
                 } else {
                     // Start next paragraph
@@ -192,7 +224,7 @@ public class EnvironmentInteraction {
             int alpha = (int)(128 + 127 * Math.sin(System.currentTimeMillis() / 200.0));
             g2.setColor(new Color(255, 255, 255, alpha));
             g2.setFont(new Font("Comic Sans MS", Font.ITALIC, 16));
-            String continueText = "Press Enter to continue";
+            String continueText = "Press E to continue";
             int textWidth = g2.getFontMetrics().stringWidth(continueText);
             g2.drawString(continueText, boxX + boxW - textWidth - 20, boxY + boxH - 20);
         }

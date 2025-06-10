@@ -37,7 +37,7 @@ public final class Player extends Entity{
     public final int screenY; // Fixed Y position on screen
 
     // Animation state
-    private String animationState = "idle"; // Can be "idle", "walk", or "run"
+    public String animationState = "idle"; // Can be "idle", "walk", or "run"
 
     // Run animation frames (10-17 for each direction)
     public BufferedImage up10, up11, up12, up13, up14, up15, up16, up17;
@@ -84,11 +84,11 @@ public final class Player extends Entity{
     }
 
     // Sets default values for player position and movement
-    public void setDefaultValues (){
-        // Set initial world position to center of the map (top-left of sprite)
-        worldX = gp.tileSize * 12;
-        worldY = gp.tileSize * 10;
-        speed = 4;              // Increased default movement speed from 3 to 4
+    public void setDefaultValues() {
+        // Set initial world position further up and to the left near the ruins and NPC
+        worldX = gp.tileSize * 12;  // Move left (was 36)
+        worldY = gp.tileSize * 10;  // Move up (was 26)
+        speed = 4;              // Default movement speed
         direction = "down";     // Default facing direction
     }
     public int getWorldX() {
@@ -582,5 +582,129 @@ public final class Player extends Entity{
         if (!isSlashing && System.currentTimeMillis() - lastSlashTime >= SLASH_COOLDOWN) {
             triggerSlash();
         }
+    }
+
+    public void drawAt(Graphics2D g2, int x, int y) {
+        // Ensure sword textures are used if player has a sword
+        if (weapon != null && (weapon.getName().toLowerCase().contains("sword") || weapon.getType().equalsIgnoreCase("sword"))) {
+            setSwordTextures(true);
+        } else {
+            setSwordTextures(false);
+        }
+        BufferedImage image = null;
+        int drawX = x;
+        int drawY = y;
+        int screenX = x;
+        int screenY = y;
+        // Draw slash animation if active
+        if (isSlashing && slashSheets[0] != null) {
+            int row = 0;
+            switch (direction) {
+                case "up": row = 0; break;
+                case "left": row = 1; break;
+                case "down": row = 2; break;
+                case "right": row = 3; break;
+            }
+            int col = currentFrame % 6; // 6 columns in slash3.png
+            image = slashSheets[0][row][col];
+            if (image != null) {
+                double scale = 2.6; // Double the scale for slash animations
+                int drawWidth = (int)(gp.tileSize * scale);
+                int drawHeight = (int)(gp.tileSize * scale);
+                drawX = screenX - drawWidth / 2 + gp.tileSize / 2;
+                drawY = screenY - drawHeight + gp.tileSize + gp.tileSize / 2 + 15; // Move slash animation down by 15 pixels total
+                g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
+                return;
+            }
+        }
+        // Otherwise, draw normal sprite
+        switch (direction) {
+            case "up":
+                if (spriteNum == 1) image = up1;
+                if (spriteNum == 2) image = up2;
+                if (spriteNum == 3) image = up3;
+                if (spriteNum == 4) image = up4;
+                if (spriteNum == 5) image = up5;
+                if (spriteNum == 6) image = up6;
+                if (spriteNum == 7) image = up7;
+                if (spriteNum == 8) image = up8;
+                if (spriteNum == 9) image = up9;
+                if (spriteNum == 10) image = up10;
+                if (spriteNum == 11) image = up11;
+                if (spriteNum == 12) image = up12;
+                if (spriteNum == 13) image = up13;
+                if (spriteNum == 14) image = up14;
+                if (spriteNum == 15) image = up15;
+                if (spriteNum == 16) image = up16;
+                if (spriteNum == 17) image = up17;
+                if (image == null) image = up1;
+                break;
+            case "left":
+                if (spriteNum == 1) image = left1;
+                if (spriteNum == 2) image = left2;
+                if (spriteNum == 3) image = left3;
+                if (spriteNum == 4) image = left4;
+                if (spriteNum == 5) image = left5;
+                if (spriteNum == 6) image = left6;
+                if (spriteNum == 7) image = left7;
+                if (spriteNum == 8) image = left8;
+                if (spriteNum == 9) image = left9;
+                if (spriteNum == 10) image = left10;
+                if (spriteNum == 11) image = left11;
+                if (spriteNum == 12) image = left12;
+                if (spriteNum == 13) image = left13;
+                if (spriteNum == 14) image = left14;
+                if (spriteNum == 15) image = left15;
+                if (spriteNum == 16) image = left16;
+                if (spriteNum == 17) image = left17;
+                if (image == null) image = left1;
+                break;
+            case "down":
+                if (spriteNum == 1) image = down1;
+                if (spriteNum == 2) image = down2;
+                if (spriteNum == 3) image = down3;
+                if (spriteNum == 4) image = down4;
+                if (spriteNum == 5) image = down5;
+                if (spriteNum == 6) image = down6;
+                if (spriteNum == 7) image = down7;
+                if (spriteNum == 8) image = down8;
+                if (spriteNum == 9) image = down9;
+                if (spriteNum == 10) image = down10;
+                if (spriteNum == 11) image = down11;
+                if (spriteNum == 12) image = down12;
+                if (spriteNum == 13) image = down13;
+                if (spriteNum == 14) image = down14;
+                if (spriteNum == 15) image = down15;
+                if (spriteNum == 16) image = down16;
+                if (spriteNum == 17) image = down17;
+                if (image == null) image = down1;
+                break;
+            case "right":
+                if (spriteNum == 1) image = right1;
+                if (spriteNum == 2) image = right2;
+                if (spriteNum == 3) image = right3;
+                if (spriteNum == 4) image = right4;
+                if (spriteNum == 5) image = right5;
+                if (spriteNum == 6) image = right6;
+                if (spriteNum == 7) image = right7;
+                if (spriteNum == 8) image = right8;
+                if (spriteNum == 9) image = right9;
+                if (spriteNum == 10) image = right10;
+                if (spriteNum == 11) image = right11;
+                if (spriteNum == 12) image = right12;
+                if (spriteNum == 13) image = right13;
+                if (spriteNum == 14) image = right14;
+                if (spriteNum == 15) image = right15;
+                if (spriteNum == 16) image = right16;
+                if (spriteNum == 17) image = right17;
+                if (image == null) image = right1;
+                break;
+        }
+        double scale = 1.3;
+        int drawWidth = (int)(gp.tileSize * scale);
+        int drawHeight = (int)(gp.tileSize * scale);
+        drawX = screenX - drawWidth / 2 + gp.tileSize / 2;
+        drawY = screenY - drawHeight + gp.tileSize;
+        g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
     }
 }

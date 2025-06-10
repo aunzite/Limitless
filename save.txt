@@ -1,8 +1,8 @@
 playerX
-1152
+2184
 playerY
-960
+4192
 direction
-down
+up
 weapon
-null
+Solthorn

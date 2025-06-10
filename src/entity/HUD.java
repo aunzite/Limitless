@@ -5,6 +5,7 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 import java.awt.AlphaComposite;
+import java.awt.Composite;
 import main.KeyHandler;
 import main.GamePanel;
 import javax.imageio.ImageIO;
@@ -39,15 +40,15 @@ public class HUD {
     private static final int BAR_WIDTH = 400;
     private static final int BAR_HEIGHT = 40;
     private static final int BAR_PADDING = 10;
-    private static final int CORNER_RADIUS = 20;
-    private static final int FONT_SIZE = 28;
-    
-    // Fade effect variables
-    private float controlHintsAlpha = 0f;
-    private static final float FADE_SPEED = 0.02f;
+    private static final int CORNER_RADIUS = 10;
+    private static final int FONT_SIZE = 20;
+    private static final float FADE_DISTANCE = 200f; // Distance at which UI starts fading
+    private static final float MIN_OPACITY = 0.3f;   // Minimum opacity when far away
+    private static final float MAX_OPACITY = 1.0f;   // Maximum opacity when close
 
-    private KeyHandler keyH;  // Add KeyHandler reference
-    private GamePanel gp;     // Add GamePanel reference
+    private float controlHintsAlpha = 1.0f;
+    private KeyHandler keyH;
+    private GamePanel gp;
 
     // Constructor
     public HUD(GamePanel gp, KeyHandler keyH) {
@@ -68,20 +69,23 @@ public class HUD {
         this.playerHealth = playerHP;
         this.playerStamina = playerStamina;
         this.weaponName = weaponName;
-        
-        // Update control hints fading
-        if (!isMoving && controlHintsAlpha < 1f) {
-            controlHintsAlpha = Math.min(1f, controlHintsAlpha + FADE_SPEED);
-        } else if (isMoving && controlHintsAlpha > 0f) {
-            controlHintsAlpha = Math.max(0f, controlHintsAlpha - FADE_SPEED);
-        }
     }
 
     // Draw HUD on screen
     public void draw(Graphics2D g2, Weapon weapon) {
-        // Save original composite
-        AlphaComposite originalComposite = (AlphaComposite) g2.getComposite();
+        // Calculate distance from player to UI elements in shrine state
+        float opacity = MAX_OPACITY;
+        if (gp.gameState == GamePanel.SHRINE_STATE) {
+            // Always use full opacity in shrine
+            opacity = MAX_OPACITY;
+        }
+
+        // Store original composite
+        Composite originalComposite = (AlphaComposite) g2.getComposite();
         BasicStroke originalStroke = (BasicStroke) g2.getStroke();
+        
+        // Set composite for opacity
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
         
         // Draw health bar
         drawBar(g2, 10, 10, playerHealth, 100, Color.RED, "HP: " + playerHealth);

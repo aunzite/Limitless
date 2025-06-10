@@ -27,7 +27,7 @@ public final class TileManager {
     // Constructor initializes tile system and loads resources
     public TileManager (GamePanel gp) {
         this.gp = gp;
-        tile = new Tile[10];    // Support up to 10 different tile types
+        tile = new Tile[11];    // Support up to 11 different tile types
         mapTileNum = new int[gp.maxWorldCol][gp.maxWorldRow];    // Create map array
 
         getTileImage();          // Load tile images
@@ -84,6 +84,11 @@ public final class TileManager {
             tile[9] = new Tile();
             tile[9].image = ImageIO.read(new File("res/tiles/water.png"));
             tile[9].collision = true; //Collsion added to this texutre.
+
+            //Index 10: Dark Floor
+            tile[10] = new Tile();
+            tile[10].image = ImageIO.read(new File("res/tiles/dfloor.png"));
+            tile[10].collision = false; // No collision for the floor
 
         } catch (IOException e) {}
     }
