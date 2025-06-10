@@ -12,6 +12,7 @@ public class AudioManager {
     private Clip area1Music;
     private Clip area2Music;
     private Clip area3Music;
+    private Clip mainAreaMusic;  // New field for main area music
     private Clip currentMusic;
     private float volume = 0.2f; // Default volume (0.0 to 1.0)
     
@@ -37,6 +38,17 @@ public class AudioManager {
                 System.out.println("Main menu music loaded successfully");
             }
             
+            // Load main area music
+            File mainAreaFile = new File("res/audio/area_1.wav");  // Updated file name
+            if (mainAreaFile.exists()) {
+                AudioInputStream audioIn = AudioSystem.getAudioInputStream(mainAreaFile);
+                mainAreaMusic = AudioSystem.getClip();
+                mainAreaMusic.open(audioIn);
+                System.out.println("Main area music loaded successfully");
+            } else {
+                System.err.println("Main area music file not found: res/audio/area_1.wav");
+            }
+            
             // Load other music files as needed
             // Example for game over music:
             File gameOverFile = new File("res/audio/game_over.wav");
@@ -55,6 +67,10 @@ public class AudioManager {
     
     public void playMainMenuMusic() {
         playMusic(mainMenuMusic);
+    }
+    
+    public void playMainAreaMusic() {
+        playMusic(mainAreaMusic);
     }
     
     public void playGameOverMusic() {

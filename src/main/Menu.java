@@ -97,6 +97,7 @@ public class Menu implements MouseListener, MouseMotionListener {
         switch (option) {
             case 0: // Play
                 audioManager.stopMusic(); // Stop menu music when starting game
+                audioManager.playMainAreaMusic(); // Play main area music
                 gp.gameState = GamePanel.PLAY_STATE;
                 break;
             case 1: // Options

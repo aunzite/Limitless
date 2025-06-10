@@ -57,6 +57,7 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
     public Menu menu;                               // Main menu
     public OptionsMenu optionsMenu;                 // Options menu
     public PauseMenu pauseMenu;  // Add pause menu reference
+    private EnvironmentInteraction[] envInteractions;  // Environmental interactions
 
     // Game state
     public static final int MENU_STATE = 0;
@@ -118,8 +119,63 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         // Set initial positions
         player.worldX = (screenWidth / 2) + (tileSize * 5);  // Move 5 tiles right
         player.worldY = (screenHeight / 2) + (tileSize * 5); // Move 5 tiles down
-        npc.worldX = (screenWidth / 2) + (tileSize * 15);    // Position NPC near water
+        npc.worldX = (screenWidth / 2) + (tileSize * 15);
         npc.worldY = (screenHeight / 2) + (tileSize * 7);    // Position NPC slightly below the water
+        
+        // Initialize environmental interactions
+        envInteractions = new EnvironmentInteraction[4];
+        
+        // Spawn ruins interaction
+        String[] spawnRuinsDialogue = {
+            "These ruins mark the beginning of your journey.",
+            "Their weathered stones hold memories of those who came before.",
+            "The path ahead leads to the forest below.",
+            "It fills you with determination!"
+        };
+        envInteractions[0] = new EnvironmentInteraction(this, keyH, "Spawn Ruins", 
+            tileSize * 12,  // X position (12,7)
+            tileSize * 7,   // Y position
+            tileSize * 2,   // Interaction radius
+            spawnRuinsDialogue);
+        
+        // Pond interaction
+        String[] pondDialogue = {
+            "The water's surface ripples gently, reflecting the pale light above.",
+            "Something about this place feels ancient, like it holds memories of better times.",
+            "You feel a strange pull towards the forest below.",
+            "It fills you with determination!"
+        };
+        envInteractions[1] = new EnvironmentInteraction(this, keyH, "Ancient Pond", 
+            tileSize * 35,  // X position (35,13)
+            tileSize * 13,  // Y position
+            tileSize * 2,   // Interaction radius
+            pondDialogue);
+            
+        // Arrow ruins interaction
+        String[] ruinsDialogue = {
+            "The arrow-shaped ruins point downward, towards the forest.",
+            "Their weathered surface tells stories of countless battles fought here.",
+            "The path below seems to call to you.",
+            "It fills you with determination!"
+        };
+        envInteractions[2] = new EnvironmentInteraction(this, keyH, "Arrow Ruins",
+            tileSize * 51,  // X position (51,6)
+            tileSize * 6,   // Y position
+            tileSize * 2,   // Interaction radius
+            ruinsDialogue);
+            
+        // Forest edge interaction
+        String[] forestDialogue = {
+            "The forest's edge seems to pulse with an otherworldly energy.",
+            "Shadows dance between the trees, beckoning you forward.",
+            "Your journey truly begins below.",
+            "It fills you with determination!"
+        };
+        envInteractions[3] = new EnvironmentInteraction(this, keyH, "Forest Edge",
+            tileSize * 61,  // X position (61,20)
+            tileSize * 20,  // Y position
+            tileSize * 2,   // Interaction radius
+            forestDialogue);
         
         // Set frame to maximized
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -218,9 +274,15 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
             return;
         }
         
-        // Only update NPC if inventory is not open
+        // Only update NPC and environmental interactions if inventory is not open
         if (!player.inventory.isOpen()) {
             npc.update();
+            // Update environmental interactions
+            for (EnvironmentInteraction interaction : envInteractions) {
+                if (interaction != null) {
+                    interaction.update();
+                }
+            }
         }
         
         // Always update player
@@ -315,6 +377,7 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         boolean nearApple = false, nearSolthorn = false;
         int solthornScreenX = -1, solthornScreenY = -1, solthornObjIndex = -1;
         int solthornQuantity = 1; // For future-proofing, but Solthorn is unique
+        
         for(int i = 0; i < obj.length; i++) {
             if(obj[i] != null) {
                 obj[i].draw(g2, this);
@@ -340,6 +403,13 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         
         // Draw NPC
         npc.draw(g2);
+        
+        // Draw environmental interactions
+        for (EnvironmentInteraction interaction : envInteractions) {
+            if (interaction != null) {
+                interaction.draw(g2);
+            }
+        }
         
         // Draw player
         player.draw(g2);
