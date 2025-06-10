@@ -133,8 +133,13 @@ public class EnvironmentInteraction {
     }
     
     private void drawInteractionMessage(Graphics2D g2, int screenX, int screenY) {
+<<<<<<< HEAD
+        String message = "Press Enter to interact";
+        g2.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
+=======
         String message = "Press E to interact";
         g2.setFont(new Font("Arial", Font.BOLD, 16));
+>>>>>>> 85801160563dc370b0ef2d3376d91afa7643393b
         
         // Get the width of the message for centering
         int messageWidth = g2.getFontMetrics().stringWidth(message);
@@ -174,13 +179,11 @@ public class EnvironmentInteraction {
         
         // Draw interaction name
         Font nameFont = new Font("Comic Sans MS", Font.BOLD, 28);
-        if (nameFont == null) nameFont = new Font("Arial", Font.BOLD, 28);
         g2.setFont(nameFont);
         g2.drawString(interactionName, boxX + 20, boxY + 38);
         
         // Draw dialogue text
         Font dialogueFont = new Font("Comic Sans MS", Font.PLAIN, 22);
-        if (dialogueFont == null) dialogueFont = new Font("Arial", Font.PLAIN, 22);
         g2.setFont(dialogueFont);
         drawStringMultiLine(g2, visibleText.toString(), boxX + 20, boxY + 70, boxW - 40);
         
@@ -188,8 +191,13 @@ public class EnvironmentInteraction {
         if (inDialogue && currentParagraph < paragraphs.length) {
             int alpha = (int)(128 + 127 * Math.sin(System.currentTimeMillis() / 200.0));
             g2.setColor(new Color(255, 255, 255, alpha));
+<<<<<<< HEAD
+            g2.setFont(new Font("Comic Sans MS", Font.ITALIC, 16));
+            String continueText = "Press Enter to continue";
+=======
             g2.setFont(new Font("Arial", Font.ITALIC, 16));
             String continueText = "Press E to continue";
+>>>>>>> 85801160563dc370b0ef2d3376d91afa7643393b
             int textWidth = g2.getFontMetrics().stringWidth(continueText);
             g2.drawString(continueText, boxX + boxW - textWidth - 20, boxY + boxH - 20);
         }

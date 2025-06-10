@@ -10,8 +10,8 @@ public class PauseMenu implements MouseListener, MouseMotionListener {
     private GamePanel gp;
     private int selectedOption = 0;
     private final String[] options = {"Resume", "Main Menu", "Quit"};
-    private Font titleFont;
-    private Font menuFont;
+    private Font titleFont = new Font("Comic Sans MS", Font.BOLD, 72);
+    private Font menuFont = new Font("Comic Sans MS", Font.PLAIN, 36);
     private Rectangle[] optionBounds;
     private int hoveredOption = -1;
     private float[] optionScales;
@@ -24,8 +24,8 @@ public class PauseMenu implements MouseListener, MouseMotionListener {
         this.audioManager = AudioManager.getInstance();
         
         // Initialize fonts
-        titleFont = new Font("Arial", Font.BOLD, 60);
-        menuFont = new Font("Arial", Font.BOLD, 30);
+        titleFont = new Font("Comic Sans MS", Font.BOLD, 72);
+        menuFont = new Font("Comic Sans MS", Font.PLAIN, 36);
         
         // Initialize menu options
         optionBounds = new Rectangle[options.length];

@@ -35,7 +35,6 @@ public class AudioManager {
                 AudioInputStream audioIn = AudioSystem.getAudioInputStream(mainMenuFile);
                 mainMenuMusic = AudioSystem.getClip();
                 mainMenuMusic.open(audioIn);
-                System.out.println("Main menu music loaded successfully");
             }
             
             // Load main area music
@@ -44,9 +43,6 @@ public class AudioManager {
                 AudioInputStream audioIn = AudioSystem.getAudioInputStream(mainAreaFile);
                 mainAreaMusic = AudioSystem.getClip();
                 mainAreaMusic.open(audioIn);
-                System.out.println("Main area music loaded successfully");
-            } else {
-                System.err.println("Main area music file not found: res/audio/area_1.wav");
             }
             
             // Load other music files as needed
@@ -56,12 +52,10 @@ public class AudioManager {
                 AudioInputStream audioIn = AudioSystem.getAudioInputStream(gameOverFile);
                 gameOverMusic = AudioSystem.getClip();
                 gameOverMusic.open(audioIn);
-                System.out.println("Game over music loaded successfully");
             }
             
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-            System.err.println("Error loading music: " + e.getMessage());
-            e.printStackTrace();
+            // Handle error silently
         }
     }
     
@@ -95,7 +89,6 @@ public class AudioManager {
     
     private void playMusic(Clip clip) {
         if (clip == null) {
-            System.err.println("Music clip is null");
             return;
         }
         
@@ -115,10 +108,8 @@ public class AudioManager {
             float dB = (float) (Math.log(volume) / Math.log(10.0) * 20.0);
             gainControl.setValue(dB);
             
-            System.out.println("Music started playing");
         } catch (Exception e) {
-            System.err.println("Error playing music: " + e.getMessage());
-            e.printStackTrace();
+            // Handle error silently
         }
     }
     
@@ -126,7 +117,6 @@ public class AudioManager {
         if (currentMusic != null) {
             currentMusic.stop();
             currentMusic = null;
-            System.out.println("Music stopped");
         }
     }
     

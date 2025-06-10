@@ -382,8 +382,13 @@ public class NPC extends Entity {
     }
     
     private void drawInteractionMessage(Graphics2D g2, int screenX, int screenY) {
+<<<<<<< HEAD
+        String message = "Press Enter to chat";
+        g2.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
+=======
         String message = "Press E to chat";
         g2.setFont(new Font("Arial", Font.BOLD, 16));
+>>>>>>> 85801160563dc370b0ef2d3376d91afa7643393b
         
         // Get the width of the message for centering
         int messageWidth = g2.getFontMetrics().stringWidth(message);
@@ -429,17 +434,14 @@ public class NPC extends Entity {
             BufferedImage elariaSprite = getCurrentSprite();
             g2.drawImage(elariaSprite, spriteX, spriteY, spriteSize, spriteSize, null);
             Font nameFont = new Font("Comic Sans MS", Font.BOLD, 28);
-            if (nameFont == null) nameFont = new Font("Arial", Font.BOLD, 28);
             g2.setFont(nameFont);
             g2.drawString(npcName, boxX + spriteSize + 20, boxY + 38);
             Font dialogueFont = new Font("Comic Sans MS", Font.PLAIN, 22);
-            if (dialogueFont == null) dialogueFont = new Font("Arial", Font.PLAIN, 22);
             g2.setFont(dialogueFont);
             drawStringMultiLine(g2, visibleText.toString(), boxX + spriteSize + 20, boxY + 70, boxW - spriteSize - 40);
         } else {
             // Only draw the bracketed text, centered in the box
             Font bracketFont = new Font("Comic Sans MS", Font.ITALIC, 22);
-            if (bracketFont == null) bracketFont = new Font("Arial", Font.ITALIC, 22);
             g2.setFont(bracketFont);
             FontMetrics fm = g2.getFontMetrics();
             int textWidth = fm.stringWidth(visibleText.toString());
@@ -452,8 +454,13 @@ public class NPC extends Entity {
         if (inDialogue && currentParagraph < paragraphs.size()) {
             int alpha = (int)(128 + 127 * Math.sin(System.currentTimeMillis() / 200.0));
             g2.setColor(new Color(255, 255, 255, alpha));
+<<<<<<< HEAD
+            g2.setFont(new Font("Comic Sans MS", Font.ITALIC, 16));
+            String continueText = "Press Enter to continue";
+=======
             g2.setFont(new Font("Arial", Font.ITALIC, 16));
             String continueText = "Press E to continue";
+>>>>>>> 85801160563dc370b0ef2d3376d91afa7643393b
             int textWidth = g2.getFontMetrics().stringWidth(continueText);
             // Position in bottom right of dialogue box
             g2.drawString(continueText, boxX + boxW - textWidth - 20, boxY + boxH - 20);
