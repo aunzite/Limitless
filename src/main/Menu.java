@@ -1,7 +1,6 @@
 package main;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -24,10 +23,12 @@ public class Menu implements MouseListener, MouseMotionListener {
     private BufferedImage frameBuffer;
     private int frameWidth;
     private int frameHeight;
+    private AudioManager audioManager;
     
     public Menu(GamePanel gp) {
         this.gp = gp;
         this.settings = GameSettings.getInstance();
+        this.audioManager = AudioManager.getInstance();
         
         // Initialize fonts
         titleFont = new Font("Arial", Font.BOLD, 60);
@@ -62,6 +63,9 @@ public class Menu implements MouseListener, MouseMotionListener {
         // Add mouse listeners
         gp.addMouseListener(this);
         gp.addMouseMotionListener(this);
+        
+        // Start playing main menu music
+        audioManager.playMainMenuMusic();
     }
     
     public void update() {
@@ -92,7 +96,8 @@ public class Menu implements MouseListener, MouseMotionListener {
     private void handleSelection(int option) {
         switch (option) {
             case 0: // Play
-                gp.saver.loadGame(); // Load saved game state
+                audioManager.stopMusic(); // Stop menu music when starting game
+                audioManager.playMainAreaMusic(); // Play main area music
                 gp.gameState = GamePanel.PLAY_STATE;
                 break;
             case 1: // Options

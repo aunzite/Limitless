@@ -76,8 +76,8 @@ public final class Player extends Entity{
         screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
         screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
        
-
-        playerHitbox = new Rectangle(24, 0, 32, 88);
+        // Make collision box smaller and more centered
+        playerHitbox = new Rectangle(28, 16, 24, 48);
 
         setDefaultValues();
         getPlayerImage();
