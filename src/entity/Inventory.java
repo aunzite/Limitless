@@ -271,6 +271,16 @@ public class Inventory {
         // Draw overlay
         g2.setColor(new Color(0, 0, 0, 128));
         g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
+        
+        // Draw right-click hint
+        g2.setFont(new Font("Arial", Font.ITALIC, 16));
+        String hint = "Right-click items for more options";
+        int hintWidth = g2.getFontMetrics().stringWidth(hint);
+        int hintX = (gp.screenWidth - hintWidth) / 2;
+        int hintY = 30;
+        g2.setColor(new Color(255, 255, 255, 180));
+        g2.drawString(hint, hintX, hintY);
+        
         // Draw grid
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {

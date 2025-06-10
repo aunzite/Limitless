@@ -1,9 +1,9 @@
 package main;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
-import java.awt.BasicStroke;
 
 public class Dialogue {
     private String line = "";
@@ -68,7 +68,7 @@ public class Dialogue {
             int alpha = (int)(128 + 127 * Math.sin(System.currentTimeMillis() / 200.0));
             g2.setColor(new Color(255, 255, 255, alpha));
             g2.setFont(new Font("Arial", Font.ITALIC, 16));
-            String continueText = "Press Enter to continue";
+            String continueText = "Press E to continue";
             int textWidth = g2.getFontMetrics().stringWidth(continueText);
             g2.drawString(continueText, x + width - textWidth - 20, y + height - 20);
         }

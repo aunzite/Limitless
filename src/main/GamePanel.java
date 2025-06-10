@@ -298,9 +298,9 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         }
         
         // Handle dialogue clearing
-        if (keyH.enterPressed && !dialogue.getLine().equals("")) {
+        if (keyH.ePressed && !dialogue.getLine().equals("")) {
             dialogue.clear();
-            keyH.enterPressed = false; // Prevent multiple triggers
+            keyH.ePressed = false; // Prevent multiple triggers
         }
         
         // Handle pause menu toggle

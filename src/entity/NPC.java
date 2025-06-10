@@ -2,22 +2,21 @@
 
 package entity;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import javax.imageio.ImageIO;
-import main.GamePanel;
-import main.KeyHandler;
-import java.awt.Font;
-import java.awt.Color;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.awt.FontMetrics;
-import entity.Item;
+import javax.imageio.ImageIO;
+import main.GamePanel;
+import main.KeyHandler;
 
 public class NPC extends Entity {
     GamePanel gp;
@@ -179,9 +178,9 @@ public class NPC extends Entity {
             }
             
             // Handle dialogue progression with enter key
-            if (keyH.enterPressed) {
+            if (keyH.ePressed) {
                 handleDialogue();
-                keyH.enterPressed = false;
+                keyH.ePressed = false;
             }
 
             // Scrolling effect
@@ -229,9 +228,9 @@ public class NPC extends Entity {
             }
             
             // Handle interaction with Enter key
-            if (keyH.enterPressed) {
+            if (keyH.ePressed) {
                 handleDialogue();
-                keyH.enterPressed = false;
+                keyH.ePressed = false;
             }
             return;
         }
@@ -383,7 +382,7 @@ public class NPC extends Entity {
     }
     
     private void drawInteractionMessage(Graphics2D g2, int screenX, int screenY) {
-        String message = "Press Enter to chat";
+        String message = "Press E to chat";
         g2.setFont(new Font("Arial", Font.BOLD, 16));
         
         // Get the width of the message for centering
@@ -454,7 +453,7 @@ public class NPC extends Entity {
             int alpha = (int)(128 + 127 * Math.sin(System.currentTimeMillis() / 200.0));
             g2.setColor(new Color(255, 255, 255, alpha));
             g2.setFont(new Font("Arial", Font.ITALIC, 16));
-            String continueText = "Press Enter to continue";
+            String continueText = "Press E to continue";
             int textWidth = g2.getFontMetrics().stringWidth(continueText);
             // Position in bottom right of dialogue box
             g2.drawString(continueText, boxX + boxW - textWidth - 20, boxY + boxH - 20);

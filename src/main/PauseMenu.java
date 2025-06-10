@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.image.BufferedImage;
 import java.awt.geom.AffineTransform;
 
 public class PauseMenu implements MouseListener, MouseMotionListener {
@@ -18,9 +17,11 @@ public class PauseMenu implements MouseListener, MouseMotionListener {
     private float[] optionScales;
     private static final float SCALE_SPEED = 0.1f;
     private static final float MAX_SCALE = 1.2f;
+    private AudioManager audioManager;
     
     public PauseMenu(GamePanel gp) {
         this.gp = gp;
+        this.audioManager = AudioManager.getInstance();
         
         // Initialize fonts
         titleFont = new Font("Arial", Font.BOLD, 60);
@@ -77,6 +78,8 @@ public class PauseMenu implements MouseListener, MouseMotionListener {
                 gp.gameState = GamePanel.PLAY_STATE;
                 break;
             case 1: // Main Menu
+                audioManager.stopMusic(); // Stop current music
+                audioManager.playMainMenuMusic(); // Play menu music
                 gp.gameState = GamePanel.MENU_STATE;
                 break;
             case 2: // Quit
