@@ -6,15 +6,15 @@
 // - Implements KeyListener interface for input handling (Aun)
 // - Tracks WASD movement key states (Aun)
 // - Manages sprint modifier with shift key (Aun)
-// - Adds Enter key support for dialogue interactions (Ahmed)
+// - Adds Enter key support for dialogue interactions (Aun)
 // - Updates movement flags based on key events (Aun)
 /////////////////////////////////////////////////////////////////////////////
 
 package main;
 
+import entity.HUD;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import entity.HUD;
 
 // Handles keyboard input for the game by implementing KeyListener interface
 // Tracks the state of movement keys (WASD), Enter, and Shift modifiers
@@ -29,7 +29,7 @@ public class KeyHandler implements KeyListener {
     public boolean downPressed;      // S key state for downward movement
     public boolean leftPressed;      // A key state for left movement
     public boolean rightPressed;     // D key state for right movement
-    public boolean enterPressed;     // Enter key state for dialogue advancing (Ahmed)
+    public boolean enterPressed;     // Enter key state for dialogue advancing (Aun)
     public boolean ePressed;         // E key state for NPC interaction
     public boolean f11Pressed;       // F11 key state for fullscreen toggle
     public boolean escapePressed;    // Escape key state for quitting
