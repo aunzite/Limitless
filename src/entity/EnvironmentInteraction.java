@@ -1,9 +1,8 @@
 package entity;
 
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.Graphics2D;
 import main.GamePanel;
 import main.KeyHandler;
 
@@ -47,9 +46,9 @@ public class EnvironmentInteraction {
             }
             
             // Handle dialogue progression with enter key
-            if (keyH.enterPressed) {
+            if (keyH.ePressed) {
                 handleDialogue();
-                keyH.enterPressed = false;
+                keyH.ePressed = false;
             }
 
             // Scrolling effect
@@ -77,9 +76,9 @@ public class EnvironmentInteraction {
         inRange = distance < interactionRadius;
         
         // Handle dialogue interaction
-        if (inRange && keyH.enterPressed) {
+        if (inRange && keyH.ePressed) {
             handleDialogue();
-            keyH.enterPressed = false;
+            keyH.ePressed = false;
         }
     }
     
@@ -134,8 +133,13 @@ public class EnvironmentInteraction {
     }
     
     private void drawInteractionMessage(Graphics2D g2, int screenX, int screenY) {
+<<<<<<< HEAD
         String message = "Press Enter to interact";
         g2.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
+=======
+        String message = "Press E to interact";
+        g2.setFont(new Font("Arial", Font.BOLD, 16));
+>>>>>>> 85801160563dc370b0ef2d3376d91afa7643393b
         
         // Get the width of the message for centering
         int messageWidth = g2.getFontMetrics().stringWidth(message);
@@ -187,8 +191,13 @@ public class EnvironmentInteraction {
         if (inDialogue && currentParagraph < paragraphs.length) {
             int alpha = (int)(128 + 127 * Math.sin(System.currentTimeMillis() / 200.0));
             g2.setColor(new Color(255, 255, 255, alpha));
+<<<<<<< HEAD
             g2.setFont(new Font("Comic Sans MS", Font.ITALIC, 16));
             String continueText = "Press Enter to continue";
+=======
+            g2.setFont(new Font("Arial", Font.ITALIC, 16));
+            String continueText = "Press E to continue";
+>>>>>>> 85801160563dc370b0ef2d3376d91afa7643393b
             int textWidth = g2.getFontMetrics().stringWidth(continueText);
             g2.drawString(continueText, boxX + boxW - textWidth - 20, boxY + boxH - 20);
         }

@@ -2,22 +2,21 @@
 
 package entity;
 
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import javax.imageio.ImageIO;
-import main.GamePanel;
-import main.KeyHandler;
-import java.awt.Font;
-import java.awt.Color;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.awt.FontMetrics;
-import entity.Item;
+import javax.imageio.ImageIO;
+import main.GamePanel;
+import main.KeyHandler;
 
 public class NPC extends Entity {
     GamePanel gp;
@@ -179,9 +178,9 @@ public class NPC extends Entity {
             }
             
             // Handle dialogue progression with enter key
-            if (keyH.enterPressed) {
+            if (keyH.ePressed) {
                 handleDialogue();
-                keyH.enterPressed = false;
+                keyH.ePressed = false;
             }
 
             // Scrolling effect
@@ -229,9 +228,9 @@ public class NPC extends Entity {
             }
             
             // Handle interaction with Enter key
-            if (keyH.enterPressed) {
+            if (keyH.ePressed) {
                 handleDialogue();
-                keyH.enterPressed = false;
+                keyH.ePressed = false;
             }
             return;
         }
@@ -383,8 +382,13 @@ public class NPC extends Entity {
     }
     
     private void drawInteractionMessage(Graphics2D g2, int screenX, int screenY) {
+<<<<<<< HEAD
         String message = "Press Enter to chat";
         g2.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
+=======
+        String message = "Press E to chat";
+        g2.setFont(new Font("Arial", Font.BOLD, 16));
+>>>>>>> 85801160563dc370b0ef2d3376d91afa7643393b
         
         // Get the width of the message for centering
         int messageWidth = g2.getFontMetrics().stringWidth(message);
@@ -450,8 +454,13 @@ public class NPC extends Entity {
         if (inDialogue && currentParagraph < paragraphs.size()) {
             int alpha = (int)(128 + 127 * Math.sin(System.currentTimeMillis() / 200.0));
             g2.setColor(new Color(255, 255, 255, alpha));
+<<<<<<< HEAD
             g2.setFont(new Font("Comic Sans MS", Font.ITALIC, 16));
             String continueText = "Press Enter to continue";
+=======
+            g2.setFont(new Font("Arial", Font.ITALIC, 16));
+            String continueText = "Press E to continue";
+>>>>>>> 85801160563dc370b0ef2d3376d91afa7643393b
             int textWidth = g2.getFontMetrics().stringWidth(continueText);
             // Position in bottom right of dialogue box
             g2.drawString(continueText, boxX + boxW - textWidth - 20, boxY + boxH - 20);
