@@ -41,6 +41,8 @@ public class NPC extends Entity {
     private boolean paragraphFullyShown = false;
     private final String npcName = "Elaria";
     private String weaponCommand = null; // Store weapon command separately
+    private long lastInteractionTime = 0;  // Track last interaction time
+    private static final long INTERACTION_COOLDOWN = 1000;  // 1 second cooldown in milliseconds
     
     public NPC(GamePanel gp, KeyHandler keyH) {
         this.gp = gp;
@@ -174,6 +176,7 @@ public class NPC extends Entity {
                 currentParagraph = 0;
                 gp.gameState = GamePanel.PLAY_STATE;
                 keyH.escapePressed = false;
+                lastInteractionTime = System.currentTimeMillis();  // Set cooldown when dialogue ends
                 return;
             }
             
@@ -227,8 +230,9 @@ public class NPC extends Entity {
                 direction = "right";
             }
             
-            // Handle interaction with Enter key
-            if (keyH.ePressed) {
+            // Check cooldown before allowing interaction
+            long currentTime = System.currentTimeMillis();
+            if (keyH.ePressed && currentTime - lastInteractionTime >= INTERACTION_COOLDOWN) {
                 handleDialogue();
                 keyH.ePressed = false;
             }
@@ -290,6 +294,7 @@ public class NPC extends Entity {
                     inDialogue = false;
                     currentParagraph = 0;
                     gp.gameState = GamePanel.PLAY_STATE;
+                    lastInteractionTime = System.currentTimeMillis();  // Set cooldown when dialogue actually ends
                 } else {
                     // Start next paragraph
                     visibleText.setLength(0);
@@ -382,13 +387,8 @@ public class NPC extends Entity {
     }
     
     private void drawInteractionMessage(Graphics2D g2, int screenX, int screenY) {
-<<<<<<< HEAD
-        String message = "Press Enter to chat";
-        g2.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
-=======
         String message = "Press E to chat";
-        g2.setFont(new Font("Arial", Font.BOLD, 16));
->>>>>>> 85801160563dc370b0ef2d3376d91afa7643393b
+        g2.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
         
         // Get the width of the message for centering
         int messageWidth = g2.getFontMetrics().stringWidth(message);
@@ -454,13 +454,10 @@ public class NPC extends Entity {
         if (inDialogue && currentParagraph < paragraphs.size()) {
             int alpha = (int)(128 + 127 * Math.sin(System.currentTimeMillis() / 200.0));
             g2.setColor(new Color(255, 255, 255, alpha));
-<<<<<<< HEAD
+
             g2.setFont(new Font("Comic Sans MS", Font.ITALIC, 16));
             String continueText = "Press Enter to continue";
-=======
-            g2.setFont(new Font("Arial", Font.ITALIC, 16));
-            String continueText = "Press E to continue";
->>>>>>> 85801160563dc370b0ef2d3376d91afa7643393b
+
             int textWidth = g2.getFontMetrics().stringWidth(continueText);
             // Position in bottom right of dialogue box
             g2.drawString(continueText, boxX + boxW - textWidth - 20, boxY + boxH - 20);

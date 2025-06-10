@@ -67,13 +67,8 @@ public class Dialogue {
         if(!line.equals("")) {
             int alpha = (int)(128 + 127 * Math.sin(System.currentTimeMillis() / 200.0));
             g2.setColor(new Color(255, 255, 255, alpha));
-<<<<<<< HEAD
             g2.setFont(new Font("Comic Sans MS", Font.ITALIC, 16));
             String continueText = "Press Enter to continue";
-=======
-            g2.setFont(new Font("Arial", Font.ITALIC, 16));
-            String continueText = "Press E to continue";
->>>>>>> 85801160563dc370b0ef2d3376d91afa7643393b
             int textWidth = g2.getFontMetrics().stringWidth(continueText);
             g2.drawString(continueText, x + width - textWidth - 20, y + height - 20);
         }
