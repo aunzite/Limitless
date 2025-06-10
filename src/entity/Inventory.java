@@ -497,7 +497,7 @@ public class Inventory {
         String title = item.getName() + (item.getQuantity() > 1 ? " x" + item.getQuantity() : "");
         g2.drawString(title, x + 16, y + 32);
         // Buttons
-        String[] btns = {"Drop", "Use", "Details"};
+        String[] btns = {"Drop", item.getName().equalsIgnoreCase("Solthorn") && gp.player.weapon != null && gp.player.weapon.getName().equalsIgnoreCase("Solthorn") ? "Unequip" : "Use", "Details"};
         for (int i = 0; i < 3; i++) {
             int btnY = y + 40 + i * (BUTTON_HEIGHT + BUTTON_MARGIN + 10); // Add 10px extra gap for more vertical space
             g2.setColor(i == hoveredButton ? new Color(100, 100, 255) : new Color(60, 60, 60));

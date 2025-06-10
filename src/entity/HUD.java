@@ -96,7 +96,7 @@ public class HUD {
             new Color(0, 150, 255), "Stamina: " + displayStamina);
         
         // Draw weapon name
-        g2.setFont(new Font("Arial", Font.BOLD, 20));
+        g2.setFont(new Font("Comic Sans MS", Font.BOLD, 20));
         g2.setColor(Color.WHITE);
         String displayWeapon = (weaponName == null || weaponName.equals("") || weaponName.equalsIgnoreCase("Steel Sword")) ? "None" : weaponName;
         g2.drawString("Weapon: " + displayWeapon, 20, 140);
@@ -107,7 +107,7 @@ public class HUD {
         }
         
         // Draw control hints
-        g2.setFont(new Font("Arial", Font.PLAIN, 16));
+        g2.setFont(new Font("Comic Sans MS", Font.PLAIN, 16));
         g2.setColor(new Color(255, 255, 255, (int)(controlHintsAlpha * 255)));
         // Removed control hints for WASD, Shift, and Space
         

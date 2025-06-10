@@ -1,8 +1,8 @@
 playerX
-2184
+2168
 playerY
-4192
+4132
 direction
-up
+down
 weapon
 Solthorn

@@ -17,6 +17,7 @@ import java.util.List;
 import javax.imageio.ImageIO;
 import main.GamePanel;
 import main.KeyHandler;
+import java.awt.BasicStroke;
 
 public class NPC extends Entity {
     GamePanel gp;
@@ -308,182 +309,65 @@ public class NPC extends Entity {
     
     // Draw NPC
     public void draw(Graphics2D g2) {
-        BufferedImage image = getCurrentSprite();
-        
-        // Calculate screen position
+        // Draw NPC sprite
+        BufferedImage image = null;
+        switch (direction) {
+            case "up": image = up1; break;
+            case "down": image = down1; break;
+            case "left": image = left1; break;
+            case "right": image = right1; break;
+        }
         int screenX = worldX - gp.player.worldX + gp.player.screenX;
         int screenY = worldY - gp.player.worldY + gp.player.screenY;
-        
-        // Draw the NPC at 1.3x the tile size, feet aligned
-        double scale = 1.3;
-        int drawWidth = (int)(gp.tileSize * scale);
-        int drawHeight = (int)(gp.tileSize * scale);
-        int drawX = screenX - (drawWidth - gp.tileSize) / 2;
-        int drawY = screenY - (drawHeight - gp.tileSize);
-        g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
+        g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null);
 
-        // Draw interaction message if player is in range
-        if (inRange) {
-            if (inDialogue) {
-                drawDialogueBox(g2);
-            } else {
-                drawInteractionMessage(g2, screenX, screenY);
+        // Draw dialogue box if in dialogue
+        if (inDialogue) {
+            // Draw dialogue box
+            int boxX = 50;
+            int boxY = gp.screenHeight - 200;
+            int boxWidth = gp.screenWidth - 100;
+            int boxHeight = 150;
+            
+            // Draw semi-transparent black background
+            g2.setColor(new Color(0, 0, 0, 200));
+            g2.fillRoundRect(boxX, boxY, boxWidth, boxHeight, 20, 20);
+            
+            // Draw white border
+            g2.setColor(Color.WHITE);
+            g2.setStroke(new BasicStroke(2));
+            g2.drawRoundRect(boxX, boxY, boxWidth, boxHeight, 20, 20);
+            
+            // Draw text
+            g2.setFont(new Font("Comic Sans MS", Font.PLAIN, 24));
+            g2.setColor(Color.WHITE);
+            
+            // Draw visible text with word wrap
+            String text = visibleText.toString();
+            String[] words = text.split(" ");
+            int x = boxX + 20;
+            int y = boxY + 40;
+            int lineWidth = 0;
+            int maxWidth = boxWidth - 40;
+            
+            for (String word : words) {
+                int wordWidth = g2.getFontMetrics().stringWidth(word + " ");
+                if (lineWidth + wordWidth > maxWidth) {
+                    y += 30;
+                    x = boxX + 20;
+                    lineWidth = 0;
+                }
+                g2.drawString(word + " ", x + lineWidth, y);
+                lineWidth += wordWidth;
             }
-        }
-    }
-    
-    private BufferedImage getCurrentSprite() {
-        return switch(direction) {
-            case "up" -> switch(spriteNum) {
-                case 1 -> up1;
-                case 2 -> up2;
-                case 3 -> up3;
-                case 4 -> up4;
-                case 5 -> up5;
-                case 6 -> up6;
-                case 7 -> up7;
-                case 8 -> up8;
-                case 9 -> up9;
-                default -> up1;
-            };
-            case "down" -> switch(spriteNum) {
-                case 1 -> down1;
-                case 2 -> down2;
-                case 3 -> down3;
-                case 4 -> down4;
-                case 5 -> down5;
-                case 6 -> down6;
-                case 7 -> down7;
-                case 8 -> down8;
-                case 9 -> down9;
-                default -> down1;
-            };
-            case "left" -> switch(spriteNum) {
-                case 1 -> left1;
-                case 2 -> left2;
-                case 3 -> left3;
-                case 4 -> left4;
-                case 5 -> left5;
-                case 6 -> left6;
-                case 7 -> left7;
-                case 8 -> left8;
-                case 9 -> left9;
-                default -> left1;
-            };
-            case "right" -> switch(spriteNum) {
-                case 1 -> right1;
-                case 2 -> right2;
-                case 3 -> right3;
-                case 4 -> right4;
-                case 5 -> right5;
-                case 6 -> right6;
-                case 7 -> right7;
-                case 8 -> right8;
-                case 9 -> right9;
-                default -> right1;
-            };
-            default -> down1;
-        };
-    }
-    
-    private void drawInteractionMessage(Graphics2D g2, int screenX, int screenY) {
-        String message = "Press E to chat";
-        g2.setFont(new Font("Comic Sans MS", Font.BOLD, 16));
-        
-        // Get the width of the message for centering
-        int messageWidth = g2.getFontMetrics().stringWidth(message);
-        
-        // Draw semi-transparent background
-        g2.setColor(new Color(0, 0, 0, 180));
-        g2.fillRoundRect(
-            screenX + (gp.tileSize - messageWidth) / 2 - 5,
-            screenY - 30,
-            messageWidth + 10,
-            25,
-            10,
-            10
-        );
-        
-        // Draw the message
-        g2.setColor(Color.WHITE);
-        g2.drawString(
-            message,
-            screenX + (gp.tileSize - messageWidth) / 2,
-            screenY - 10
-        );
-    }
-
-    private void drawDialogueBox(Graphics2D g2) {
-        int boxX = 60;
-        int boxW = gp.screenWidth - 120;
-        int boxH = 140; // Taller height
-        int boxY = gp.screenHeight - boxH - 40;
-        g2.setColor(new Color(0,0,0,220));
-        g2.fillRoundRect(boxX, boxY, boxW, boxH, 20, 20);
-        g2.setColor(Color.WHITE);
-        g2.setStroke(new java.awt.BasicStroke(3));
-        g2.drawRoundRect(boxX, boxY, boxW, boxH, 20, 20);
-        String para = (currentParagraph < paragraphs.size()) ? paragraphs.get(currentParagraph) : "";
-        boolean isBracketed = para.trim().startsWith("[") && para.trim().endsWith("]");
-        boolean isQuoted = para.contains("\"");
-        if (!isBracketed) {
-            // Draw Elaria's sprite and name if not bracketed
-            int spriteSize = gp.tileSize * 2;
-            int spriteX = boxX + 10;
-            int spriteY = boxY - spriteSize/2;
-            BufferedImage elariaSprite = getCurrentSprite();
-            g2.drawImage(elariaSprite, spriteX, spriteY, spriteSize, spriteSize, null);
-            Font nameFont = new Font("Comic Sans MS", Font.BOLD, 28);
-            g2.setFont(nameFont);
-            g2.drawString(npcName, boxX + spriteSize + 20, boxY + 38);
-            Font dialogueFont = new Font("Comic Sans MS", Font.PLAIN, 22);
-            g2.setFont(dialogueFont);
-            drawStringMultiLine(g2, visibleText.toString(), boxX + spriteSize + 20, boxY + 70, boxW - spriteSize - 40);
-        } else {
-            // Only draw the bracketed text, centered in the box
-            Font bracketFont = new Font("Comic Sans MS", Font.ITALIC, 22);
-            g2.setFont(bracketFont);
-            FontMetrics fm = g2.getFontMetrics();
-            int textWidth = fm.stringWidth(visibleText.toString());
-            int textX = boxX + (boxW - textWidth) / 2;
-            int textY = boxY + boxH / 2 + fm.getAscent() / 2;
-            g2.drawString(visibleText.toString(), textX, textY);
-        }
-
-        // Draw the continue text with pulsing effect
-        if (inDialogue && currentParagraph < paragraphs.size()) {
-            int alpha = (int)(128 + 127 * Math.sin(System.currentTimeMillis() / 200.0));
-            g2.setColor(new Color(255, 255, 255, alpha));
-
-            g2.setFont(new Font("Comic Sans MS", Font.ITALIC, 16));
-            String continueText = "Press Enter to continue";
-
-            int textWidth = g2.getFontMetrics().stringWidth(continueText);
-            // Position in bottom right of dialogue box
-            g2.drawString(continueText, boxX + boxW - textWidth - 20, boxY + boxH - 20);
-        }
-    }
-
-    private void drawStringMultiLine(Graphics2D g2, String text, int x, int y, int width) {
-        Font font = g2.getFont();
-        FontMetrics metrics = g2.getFontMetrics(font);
-        int lineHeight = metrics.getHeight();
-        String[] words = text.split(" ");
-        StringBuilder line = new StringBuilder();
-        int curY = y;
-        for (String word : words) {
-            String testLine = line + word + " ";
-            int testWidth = metrics.stringWidth(testLine);
-            if (testWidth > width) {
-                g2.drawString(line.toString(), x, curY);
-                line = new StringBuilder(word + " ");
-                curY += lineHeight;
-            } else {
-                line.append(word).append(" ");
+            
+            // Draw "Press E to continue" text
+            if (paragraphFullyShown) {
+                g2.setFont(new Font("Comic Sans MS", Font.ITALIC, 20));
+                String continueText = "Press E to continue";
+                int textWidth = g2.getFontMetrics().stringWidth(continueText);
+                g2.drawString(continueText, boxX + (boxWidth - textWidth) / 2, boxY + boxHeight - 20);
             }
-        }
-        if (line.length() > 0) {
-            g2.drawString(line.toString(), x, curY);
         }
     }
 }

@@ -581,9 +581,9 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         // Handle NOXAR_CUTSCENE_STATE
         if (gameState == NOXAR_CUTSCENE_STATE) {
             // Prevent player and boss actions
-            if (keyH.enterPressed) {
+            if (keyH.ePressed) {
                 noxarCutsceneIndex++;
-                keyH.enterPressed = false;
+                keyH.ePressed = false;
                 if (noxarCutsceneIndex >= noxarCutsceneLines.length) {
                     inNoxarCutscene = false;
                     gameState = SHRINE_STATE;
@@ -616,7 +616,7 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
             
             // Draw "Game Over" text
             g2.setColor(Color.RED);
-            g2.setFont(new Font("Arial", Font.BOLD, 72));
+            g2.setFont(new Font("Comic Sans MS", Font.BOLD, 72));
             String gameOverText = "GAME OVER";
             int textWidth = g2.getFontMetrics().stringWidth(gameOverText);
             g2.drawString(gameOverText, (screenWidth - textWidth) / 2, screenHeight / 3);
@@ -751,7 +751,7 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
             }
             g2.setFont(new Font("Comic Sans MS", Font.ITALIC, 18));
             g2.setColor(new Color(255,255,255,180));
-            g2.drawString("Press Enter to continue", screenWidth - 320, boxY + boxH - 20);
+            g2.drawString("Press E to continue", screenWidth - 320, boxY + boxH - 20);
             return;
         } else {
             // Normal game rendering
@@ -1237,35 +1237,11 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
     public void mouseMoved(MouseEvent e) {}
 
     private void resetPlayerState() {
-        // Reset position to (12,10) tiles
-        player.worldX = tileSize * 12;
-        player.worldY = tileSize * 10;
-        // Reset health and stamina
+        player.weapon = null;
+        player.setSwordTextures(false);
+        player.inventory = new Inventory(this);
         player.hp = 100;
         player.stamina = 100;
-        // Clear inventory and weapon
-        player.weapon = null;
-        // Clear inventory by setting all items to null
-        for (int i = 0; i < player.inventory.items.length; i++) {
-            for (int j = 0; j < player.inventory.items[i].length; j++) {
-                player.inventory.items[i][j] = null;
-            }
-        }
-        // Reset direction
-        player.direction = "down";
-        // Reset animation state
-        player.animationState = "idle";
-        player.spriteNum = 1;
-        player.spriteCounter = 0;
-        // Reset NPC sword-giving state
-        if (npc != null) {
-            try {
-                java.lang.reflect.Field field = npc.getClass().getDeclaredField("hasGivenSword");
-                field.setAccessible(true);
-                field.setBoolean(npc, false);
-            } catch (Exception e) {
-                // Ignore errors
-            }
-        }
+        player.setDefaultValues();
     }
 }
