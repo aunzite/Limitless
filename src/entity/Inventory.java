@@ -34,6 +34,10 @@ public class Inventory {
     private int hoveredButton = -1; // 0: Drop, 1: Use/Equip, 2: Details
     private boolean detailsPopupOpen = false;
 
+    // Add hovered slot tracking
+    private int hoveredRow = -1;
+    private int hoveredCol = -1;
+
     public Inventory(GamePanel gp) {
         this.gp = gp;
     }
@@ -95,8 +99,14 @@ public class Inventory {
                     draggedItem = item;
                     draggedItemOriginalRow = row;
                     draggedItemOriginalCol = col;
-                    dragOffsetX = mouseX - getSlotX(col);
-                    dragOffsetY = mouseY - getSlotY(row);
+                    int gridWidth = COLS * SLOT_WIDTH + (COLS - 1) * SLOT_GAP;
+                    int gridHeight = ROWS * SLOT_HEIGHT + (ROWS - 1) * SLOT_GAP;
+                    int gridStartX = (gp.screenWidth - gridWidth) / 2;
+                    int gridStartY = (gp.screenHeight - gridHeight) / 2 + OFFSET_TOP - 60;
+                    int slotX = gridStartX + col * (SLOT_WIDTH + SLOT_GAP);
+                    int slotY = gridStartY + row * (SLOT_HEIGHT + SLOT_GAP);
+                    dragOffsetX = mouseX - slotX;
+                    dragOffsetY = mouseY - slotY;
                     items[row][col] = null;
                     return;
                 }
@@ -135,6 +145,15 @@ public class Inventory {
         if (contextMenuOpen) {
             hoveredButton = getMenuButtonAt(mouseX, mouseY);
         }
+        // Track hovered slot for highlight
+        int[] slot = getSlotAt(mouseX, mouseY);
+        if (slot != null) {
+            hoveredRow = slot[0];
+            hoveredCol = slot[1];
+        } else {
+            hoveredRow = -1;
+            hoveredCol = -1;
+        }
     }
 
     private void closeMenus() {
@@ -156,9 +175,9 @@ public class Inventory {
     private int[] getSlotAt(int mouseX, int mouseY) {
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
-                int x = getSlotX(j);
-                int y = getSlotY(i);
-                if (mouseX >= x && mouseX < x + SLOT_WIDTH && mouseY >= y && mouseY < y + SLOT_HEIGHT) {
+                int x = getSlotX(j) - 50; // Offset left
+                int y = getSlotY(i) - 50; // Offset up
+                if (mouseX >= x && mouseX < x + SLOT_WIDTH + 16 && mouseY >= y && mouseY < y + SLOT_HEIGHT + 16) {
                     return new int[]{i, j};
                 }
             }
@@ -271,15 +290,79 @@ public class Inventory {
         // Draw overlay
         g2.setColor(new Color(0, 0, 0, 128));
         g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
-        // Draw grid
+        
+        // Calculate grid dimensions (remove OFFSET_LEFT for true centering)
+        int gridWidth = COLS * SLOT_WIDTH + (COLS - 1) * SLOT_GAP;
+        int gridHeight = ROWS * SLOT_HEIGHT + (ROWS - 1) * SLOT_GAP;
+        int gridStartX = (gp.screenWidth - gridWidth) / 2;
+        int gridStartY = (gp.screenHeight - gridHeight) / 2 + OFFSET_TOP - 60;
+        
+        // Draw Inventory background panel with checkerboard
+        int panelPaddingX = 40;
+        int panelPaddingY = 100;
+        int panelX = gridStartX - panelPaddingX;
+        int panelY = gridStartY - panelPaddingY;
+        int panelW = gridWidth + panelPaddingX * 2;
+        int panelH = gridHeight + panelPaddingY * 2 - 20;
+        // Drop shadow
+        g2.setColor(new Color(0, 0, 0, 100));
+        g2.fillRoundRect(panelX + 8, panelY + 8, panelW, panelH, 16, 16);
+        // Checkerboard background
+        int checkerSize = 16;
+        for (int y = 0; y < panelH; y += checkerSize) {
+            for (int x = 0; x < panelW; x += checkerSize) {
+                if (((x / checkerSize) + (y / checkerSize)) % 2 == 0) {
+                    g2.setColor(new Color(50, 40, 50, 60));
+                } else {
+                    g2.setColor(new Color(30, 20, 30, 60));
+                }
+                g2.fillRect(panelX + x, panelY + y, checkerSize, checkerSize);
+            }
+        }
+        // Panel base
+        g2.setColor(new Color(40, 30, 30, 220));
+        g2.fillRoundRect(panelX, panelY, panelW, panelH, 16, 16);
+        // Pixel-style double border
+        g2.setColor(new Color(200, 200, 255, 180));
+        g2.setStroke(new BasicStroke(4));
+        g2.drawRoundRect(panelX, panelY, panelW, panelH, 16, 16);
+        g2.setColor(new Color(120, 120, 180, 180));
+        g2.setStroke(new BasicStroke(2));
+        g2.drawRoundRect(panelX + 6, panelY + 6, panelW - 12, panelH - 12, 10, 10);
+        
+        // Draw Inventory title with pixel shadow
+        String title = "Inventory";
+        Font titleFont = new Font("Comic Sans MS", Font.BOLD, 44);
+        g2.setFont(titleFont);
+        FontMetrics fm = g2.getFontMetrics();
+        int titleX = (gp.screenWidth - fm.stringWidth(title)) / 2;
+        int titleY = panelY + 75;
+        g2.setColor(new Color(40, 30, 60, 180));
+        g2.drawString(title, titleX + 2, titleY + 2); // shadow
+        g2.setColor(Color.WHITE);
+        g2.drawString(title, titleX, titleY);
+        
+        // Draw grid with pixel-art slots
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLS; j++) {
-                int x = getSlotX(j);
-                int y = getSlotY(i);
-                g2.setColor(new Color(60, 40, 30));
-                g2.fillRect(x, y, SLOT_WIDTH, SLOT_HEIGHT);
-                g2.setColor(Color.WHITE);
-                g2.drawRect(x, y, SLOT_WIDTH, SLOT_HEIGHT);
+                int x = gridStartX + j * (SLOT_WIDTH + SLOT_GAP);
+                int y = gridStartY + i * (SLOT_HEIGHT + SLOT_GAP);
+                // Slot shadow
+                g2.setColor(new Color(0, 0, 0, 90));
+                g2.fillRoundRect(x + 4, y + 6, SLOT_WIDTH, SLOT_HEIGHT, 10, 10);
+                // Slot base (more saturated brown)
+                g2.setColor(new Color(120, 80, 50));
+                g2.fillRoundRect(x, y, SLOT_WIDTH, SLOT_HEIGHT, 10, 10);
+                // Slot highlight (pixel-art style)
+                g2.setColor(new Color(255, 255, 255, 40));
+                g2.drawRoundRect(x + 2, y + 2, SLOT_WIDTH - 4, SLOT_HEIGHT - 4, 6, 6);
+                // Slot double border (pixel frame effect)
+                g2.setColor(new Color(200, 200, 255, 120));
+                g2.setStroke(new BasicStroke(2));
+                g2.drawRoundRect(x, y, SLOT_WIDTH, SLOT_HEIGHT, 10, 10);
+                g2.setColor(new Color(80, 80, 120, 120));
+                g2.setStroke(new BasicStroke(1));
+                g2.drawRoundRect(x + 3, y + 3, SLOT_WIDTH - 6, SLOT_HEIGHT - 6, 4, 4);
             }
         }
         // Draw items
@@ -287,7 +370,9 @@ public class Inventory {
             for (int j = 0; j < COLS; j++) {
                 Item item = items[i][j];
                 if (item != null && item != draggedItem) {
-                    drawItem(g2, item, getSlotX(j), getSlotY(i));
+                    int x = gridStartX + j * (SLOT_WIDTH + SLOT_GAP);
+                    int y = gridStartY + i * (SLOT_HEIGHT + SLOT_GAP);
+                    drawItem(g2, item, x, y);
                 }
             }
         }
@@ -298,7 +383,18 @@ public class Inventory {
             SwingUtilities.convertPointFromScreen(mp, gp);
             int drawX = mp.x - dragOffsetX;
             int drawY = mp.y - dragOffsetY;
+            // Draw the item at the cursor with the same offset as when dragging started
             drawItem(g2, draggedItem, drawX, drawY);
+        }
+        // Draw slot hover highlight on top of everything
+        if (hoveredRow >= 0 && hoveredCol >= 0) {
+            int x = gridStartX + hoveredCol * (SLOT_WIDTH + SLOT_GAP);
+            int y = gridStartY + hoveredRow * (SLOT_HEIGHT + SLOT_GAP);
+            g2.setColor(new Color(90, 60, 40, 180));
+            g2.fillRoundRect(x, y, SLOT_WIDTH, SLOT_HEIGHT, 10, 10);
+            g2.setColor(new Color(200, 200, 255, 180));
+            g2.setStroke(new BasicStroke(2));
+            g2.drawRoundRect(x, y, SLOT_WIDTH, SLOT_HEIGHT, 10, 10);
         }
         // Draw context menu if open
         if (contextMenuOpen) {
@@ -332,7 +428,7 @@ public class Inventory {
         g2.setColor(Color.WHITE);
         g2.drawRoundRect(x, y, MENU_WIDTH, menuHeight, 16, 16);
         // Item name and quantity
-        g2.setFont(new Font("Arial", Font.BOLD, 18));
+        g2.setFont(new Font("Comic Sans MS", Font.BOLD, 18));
         String title = item.getName() + (item.getQuantity() > 1 ? " x" + item.getQuantity() : "");
         g2.drawString(title, x + 16, y + 32);
         // Buttons
@@ -348,7 +444,7 @@ public class Inventory {
             g2.fillRoundRect(x + 10, btnY, MENU_WIDTH - 20, BUTTON_HEIGHT, 8, 8);
             g2.setColor(Color.WHITE);
             g2.drawRoundRect(x + 10, btnY, MENU_WIDTH - 20, BUTTON_HEIGHT, 8, 8);
-            g2.setFont(new Font("Arial", Font.PLAIN, 16));
+            g2.setFont(new Font("Comic Sans MS", Font.PLAIN, 16));
             g2.drawString(btns[i], x + 30, btnY + 22);
         }
     }
@@ -358,10 +454,10 @@ public class Inventory {
         g2.fillRoundRect(x, y, w, h, 16, 16);
         g2.setColor(Color.WHITE);
         g2.drawRoundRect(x, y, w, h, 16, 16);
-        g2.setFont(new Font("Arial", Font.BOLD, 18));
+        g2.setFont(new Font("Comic Sans MS", Font.BOLD, 18));
         String title = name + (quantity > 1 ? " x" + quantity : "");
         g2.drawString(title, x + 16, y + 28);
-        g2.setFont(new Font("Arial", Font.PLAIN, 14));
+        g2.setFont(new Font("Comic Sans MS", Font.PLAIN, 14));
         int lineY = y + 52;
         for (String line : lines) {
             g2.drawString(line, x + 16, lineY);

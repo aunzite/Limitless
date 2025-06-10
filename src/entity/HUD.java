@@ -131,7 +131,7 @@ public class HUD {
         g2.drawRoundRect(x, y, BAR_WIDTH, BAR_HEIGHT, CORNER_RADIUS, CORNER_RADIUS);
         
         // Draw label
-        g2.setFont(new Font("Arial", Font.BOLD, FONT_SIZE));
+        g2.setFont(new Font("Comic Sans MS", Font.BOLD, FONT_SIZE));
         g2.drawString(label, x + 10, y + 25);
     }
 
@@ -140,10 +140,10 @@ public class HUD {
         g2.fillRoundRect(10, 320, 400, 400, CORNER_RADIUS, CORNER_RADIUS);
         
         g2.setColor(Color.WHITE);
-        g2.setFont(new Font("Arial", Font.BOLD, FONT_SIZE));
+        g2.setFont(new Font("Comic Sans MS", Font.BOLD, FONT_SIZE));
         g2.drawString("Attack History:", 20, 320);
         
-        g2.setFont(new Font("Arial", Font.PLAIN, FONT_SIZE - 8));
+        g2.setFont(new Font("Comic Sans MS", Font.PLAIN, FONT_SIZE - 8));
         java.util.ArrayList<String> history = weapon.getAttackHistory();
         for (int i = 0; i < history.size(); i++) {
             g2.drawString((i+1) + ": " + history.get(i), 20, 310 + i*30);

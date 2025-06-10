@@ -33,7 +33,6 @@ public class GifImage {
         try {
             File file = new File(path);
             if (!file.exists()) {
-                System.err.println("GIF file not found: " + path);
                 return;
             }
             
@@ -41,7 +40,6 @@ public class GifImage {
             Iterator<ImageReader> readers = ImageIO.getImageReaders(input);
             
             if (!readers.hasNext()) {
-                System.err.println("No image reader found for GIF");
                 return;
             }
             

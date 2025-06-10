@@ -45,7 +45,7 @@ public class Dialogue {
         
         // Draw text
         g2.setColor(Color.WHITE);
-        g2.setFont(new Font("Arial", Font.PLAIN, 20));
+        g2.setFont(new Font("Comic Sans MS", Font.PLAIN, 20));
         
         // Split text into multiple lines if needed
         String[] words = line.split(" ");
@@ -67,7 +67,7 @@ public class Dialogue {
         if(!line.equals("")) {
             int alpha = (int)(128 + 127 * Math.sin(System.currentTimeMillis() / 200.0));
             g2.setColor(new Color(255, 255, 255, alpha));
-            g2.setFont(new Font("Arial", Font.ITALIC, 16));
+            g2.setFont(new Font("Comic Sans MS", Font.ITALIC, 16));
             String continueText = "Press Enter to continue";
             int textWidth = g2.getFontMetrics().stringWidth(continueText);
             g2.drawString(continueText, x + width - textWidth - 20, y + height - 20);

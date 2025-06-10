@@ -19,6 +19,7 @@ public class OptionsMenu implements MouseListener, MouseMotionListener {
     private float[] optionScales;
     private static final float SCALE_SPEED = 0.1f;
     private static final float MAX_SCALE = 1.2f;
+    private boolean isBackButtonHovered = false;
     
     // UI elements
     private Rectangle backButton;
@@ -26,8 +27,8 @@ public class OptionsMenu implements MouseListener, MouseMotionListener {
     private BufferedImage backgroundImage;
     
     // Fonts
-    private Font titleFont;
-    private Font menuFont;
+    private Font titleFont = new Font("Comic Sans MS", Font.BOLD, 72);
+    private Font menuFont = new Font("Comic Sans MS", Font.PLAIN, 36);
     
     private GifImage backgroundGif;
     
@@ -36,8 +37,8 @@ public class OptionsMenu implements MouseListener, MouseMotionListener {
         this.settings = GameSettings.getInstance();
         
         // Initialize fonts
-        titleFont = new Font("Arial", Font.BOLD, 40);
-        menuFont = new Font("Arial", Font.PLAIN, 30);
+        titleFont = new Font("Comic Sans MS", Font.BOLD, 72);
+        menuFont = new Font("Comic Sans MS", Font.PLAIN, 36);
         
         // Initialize option scales
         optionScales = new float[1]; // Auto-save
@@ -142,15 +143,28 @@ public class OptionsMenu implements MouseListener, MouseMotionListener {
         g2.setColor(Color.WHITE);
         g2.drawString(label, labelX, labelY);
         
-        // Draw toggle button
-        g2.setColor(Color.DARK_GRAY);
-        g2.fillRect(autoSaveToggle.x, autoSaveToggle.y, autoSaveToggle.width, autoSaveToggle.height);
+        // Draw toggle button with hover effect
+        if (hoveredOption == 0) {
+            g2.setColor(new Color(80, 80, 80));
+        } else {
+            g2.setColor(new Color(60, 60, 60));
+        }
+        g2.fillRoundRect(autoSaveToggle.x, autoSaveToggle.y, autoSaveToggle.width, autoSaveToggle.height, 10, 10);
         
-        // Draw toggle state
-        String state = settings.isAutoSaveEnabled() ? "ON" : "OFF";
+        // Draw toggle button border
         g2.setColor(Color.WHITE);
+        g2.setStroke(new BasicStroke(2));
+        g2.drawRoundRect(autoSaveToggle.x, autoSaveToggle.y, autoSaveToggle.width, autoSaveToggle.height, 10, 10);
+        
+        // Draw toggle state with hover effect
+        String state = settings.isAutoSaveEnabled() ? "ON" : "OFF";
+        if (hoveredOption == 0) {
+            g2.setColor(new Color(200, 200, 255));
+        } else {
+            g2.setColor(Color.WHITE);
+        }
         int stateX = autoSaveToggle.x + (autoSaveToggle.width - fm.stringWidth(state)) / 2;
-        int stateY = autoSaveToggle.y + (autoSaveToggle.height + fm.getAscent()) / 2;
+        int stateY = autoSaveToggle.y + (autoSaveToggle.height - fm.getHeight()) / 2 + fm.getAscent();
         g2.drawString(state, stateX, stateY);
     }
     
@@ -158,14 +172,27 @@ public class OptionsMenu implements MouseListener, MouseMotionListener {
         String label = "Back";
         FontMetrics fm = g2.getFontMetrics();
         
-        // Draw button background
-        g2.setColor(Color.DARK_GRAY);
-        g2.fillRect(backButton.x, backButton.y, backButton.width, backButton.height);
+        // Draw button background with hover effect
+        if (isBackButtonHovered) {
+            g2.setColor(new Color(80, 80, 80));
+        } else {
+            g2.setColor(new Color(60, 60, 60));
+        }
+        g2.fillRoundRect(backButton.x, backButton.y, backButton.width, backButton.height, 10, 10);
         
-        // Draw text
+        // Draw button border
         g2.setColor(Color.WHITE);
+        g2.setStroke(new BasicStroke(2));
+        g2.drawRoundRect(backButton.x, backButton.y, backButton.width, backButton.height, 10, 10);
+        
+        // Draw text with hover effect
+        if (isBackButtonHovered) {
+            g2.setColor(new Color(200, 200, 255));
+        } else {
+            g2.setColor(Color.WHITE);
+        }
         int textX = backButton.x + (backButton.width - fm.stringWidth(label)) / 2;
-        int textY = backButton.y + (backButton.height + fm.getAscent()) / 2;
+        int textY = backButton.y + (backButton.height - fm.getHeight()) / 2 + fm.getAscent();
         g2.drawString(label, textX, textY);
     }
     
@@ -208,8 +235,11 @@ public class OptionsMenu implements MouseListener, MouseMotionListener {
     public void mouseMoved(MouseEvent e) {
         if (gp.gameState != GamePanel.OPTIONS_STATE) return;
         
+        Point mousePoint = e.getPoint();
+        isBackButtonHovered = backButton.contains(mousePoint);
+        
         // Check which option is being hovered
-        if (autoSaveToggle.contains(e.getPoint())) {
+        if (autoSaveToggle.contains(mousePoint)) {
             hoveredOption = 0;
         } else {
             hoveredOption = -1;

@@ -113,7 +113,6 @@ public final class Player extends Entity{
         try {
             BufferedImage spriteSheet = ImageIO.read(new File(sheetPath));
             if (spriteSheet == null) {
-                System.err.println("Failed to load sprite sheet: " + sheetPath);
                 return null;
             }
 
@@ -125,13 +124,11 @@ public final class Player extends Entity{
 
             // Ensure we don't go out of bounds
             if (x + spriteWidth > spriteSheet.getWidth() || y + spriteHeight > spriteSheet.getHeight()) {
-                System.err.println("Sprite position out of bounds: " + sheetPath + " at row " + row + ", col " + col);
                 return null;
             }
 
             return spriteSheet.getSubimage(x, y, spriteWidth, spriteHeight);
         } catch (IOException e) {
-            System.err.println("Error loading sprite: " + e.getMessage());
             return null;
         }
     }
@@ -267,21 +264,14 @@ public final class Player extends Entity{
         }
     }
 
-    private BufferedImage[][] loadSlashSheet(String path, int cols, int rows) {
-        System.out.println("Loading slash sheet from: " + path);
+    private BufferedImage[][] loadSlashSheet(String path, int rows, int cols) {
         try {
             File file = new File(path);
-            System.out.println("File exists: " + file.exists());
-            System.out.println("File path: " + file.getAbsolutePath());
-            
             BufferedImage sheet = ImageIO.read(file);
-            System.out.println("Sheet loaded: " + (sheet != null));
             if (sheet == null) {
-                System.err.println("Failed to load sheet: " + path);
                 return null;
             }
             
-            System.out.println("Sheet dimensions: " + sheet.getWidth() + "x" + sheet.getHeight());
             BufferedImage[][] frames = new BufferedImage[rows][cols];
             
             // Common frame dimensions for all slash animations
@@ -291,18 +281,13 @@ public final class Player extends Entity{
             int expectedWidth = cols * frameW;
             int expectedHeight = rows * frameH;
             
-            System.out.println("Expected dimensions: " + expectedWidth + "x" + expectedHeight);
-            System.out.println("Actual dimensions: " + sheet.getWidth() + "x" + sheet.getHeight());
-            
             // Check if sheet is wide enough for all columns
             if (sheet.getWidth() < expectedWidth) {
-                System.err.println("Sheet width too small for expected frames");
                 return null;
             }
             
             // Check if sheet is tall enough for all rows
             if (sheet.getHeight() < expectedHeight) {
-                System.err.println("Sheet height too small for expected frames");
                 return null;
             }
             
@@ -313,48 +298,32 @@ public final class Player extends Entity{
                         int left = x * frameW;
                         int top = y * frameH;
                         frames[y][x] = sheet.getSubimage(left, top, frameW, frameH);
-                        System.out.println("Loaded frame at " + x + "," + y);
                     } catch (Exception e) {
-                        System.err.println("Error loading frame at " + x + "," + y + ": " + e.getMessage());
                         return null;
                     }
                 }
             }
             
-            System.out.println("Successfully created frames array");
             return frames;
         } catch (Exception e) {
-            System.err.println("Error in loadSlashSheet: " + e.getMessage());
-            e.printStackTrace();
             return null;
         }
     }
 
     public void setSwordTextures(boolean hasSword) {
-        System.out.println("Setting sword textures. hasSword: " + hasSword);
         if (hasSword) {
-            System.out.println("Loading withSword textures...");
             getPlayerImageFromDir("res/player/withSword/");
             // Ensure slash animations are loaded
             try {
                 // Try loading with absolute paths
                 String basePath = new File("").getAbsolutePath();
-                System.out.println("Base path: " + basePath);
-                
-                System.out.println("Attempting to load slash3.png...");
                 String slash3Path = basePath + "/res/player/withSword/slash3.png";
-                System.out.println("Full path: " + slash3Path);
                 // slash3.png is 768x512, with 6 columns and 4 rows
                 slashSheets[0] = loadSlashSheet(slash3Path, 6, 4);
-                System.out.println("slash3.png loaded: " + (slashSheets[0] != null));
-                
-                System.out.println("Slash animation loaded successfully");
             } catch (Exception e) {
-                System.err.println("Error loading slash animation: " + e.getMessage());
-                e.printStackTrace();
+                // Handle error silently
             }
         } else {
-            System.out.println("Loading default textures...");
             getPlayerImageFromDir("res/player/");
             // Clear slash animation
             slashSheets[0] = null;

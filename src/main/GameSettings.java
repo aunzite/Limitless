@@ -90,8 +90,7 @@ public class GameSettings {
                 writer.println("keybind:" + entry.getKey() + "=" + entry.getValue());
             }
         } catch (IOException e) {
-            System.err.println("Error saving settings: " + e.getMessage());
-            e.printStackTrace();
+            // Handle error silently
         }
     }
     
@@ -123,13 +122,11 @@ public class GameSettings {
                         keybinds.put(action, Integer.parseInt(value));
                     }
                 } catch (NumberFormatException e) {
-                    System.err.println("Error parsing setting value: " + value);
-                    e.printStackTrace();
+                    // Handle error silently
                 }
             }
         } catch (IOException e) {
-            System.err.println("Error loading settings: " + e.getMessage());
-            e.printStackTrace();
+            // Handle error silently
         }
     }
     
