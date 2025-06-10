@@ -338,13 +338,9 @@ public class Inventory {
         // Buttons
         String[] btns;
         if (item.getName().equalsIgnoreCase("Solthorn")) {
-            if (gp.player.weapon != null && gp.player.weapon.getName().equalsIgnoreCase("Solthorn")) {
-                btns = new String[]{"Drop", "Unequip", "Details"};
-            } else {
-                btns = new String[]{"Drop", "Equip", "Details"};
-            }
+            btns = new String[]{"Drop", "Use", "Details"};
         } else {
-            btns = new String[]{"Drop", "Use/Equip", "Details"};
+            btns = new String[]{"Drop", "Use", "Details"};
         }
         for (int i = 0; i < 3; i++) {
             int btnY = y + 40 + i * (BUTTON_HEIGHT + BUTTON_MARGIN + 10); // Add 10px extra gap for more vertical space

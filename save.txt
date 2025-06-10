@@ -4,3 +4,5 @@ playerY
 960
 direction
 down
+weapon
+null

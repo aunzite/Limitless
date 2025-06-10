@@ -91,8 +91,9 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
         
         // Initialize components in correct order
         saver = new Saver(this);
-        hud = new HUD(null);  // Create HUD first with null KeyHandler
+        hud = new HUD(this, keyH);  // Create HUD first with null KeyHandler
         keyH = new KeyHandler(saver, hud);  // Create KeyHandler with HUD
+        keyH.setGamePanel(this);
         hud.setKeyHandler(keyH);  // Set KeyHandler in HUD
         
         // Load settings before initializing menus
@@ -496,6 +497,50 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
                 String f7Text = "Delete";
                 textWidth = fm.stringWidth(f7Text);
                 g2.drawString(f7Text, x - textWidth - 10, y + verticalSpacing * 2 + spriteSize/2 + 5);
+
+                // Draw I button hint
+                BufferedImage iSprite = ImageIO.read(new File(keyH.iPressed ? "res/buttons/ip.png" : "res/buttons/io.png"));
+                int iNaturalWidth = iSprite.getWidth();
+                int iNaturalHeight = iSprite.getHeight();
+                int iDrawWidth = (int) ((double) spriteSize / iNaturalHeight * iNaturalWidth);
+                int iDrawX = x + spriteSize - iDrawWidth;
+                g2.drawImage(iSprite, iDrawX, y + verticalSpacing * 3, iDrawWidth, spriteSize, null);
+                String iText = "Inventory";
+                textWidth = fm.stringWidth(iText);
+                g2.drawString(iText, iDrawX - textWidth - 10, y + verticalSpacing * 3 + spriteSize/2 + 5);
+
+                // Draw E button hint
+                BufferedImage eSprite = ImageIO.read(new File(keyH.ePressed ? "res/buttons/ep.png" : "res/buttons/eo.png"));
+                int eNaturalWidth = eSprite.getWidth();
+                int eNaturalHeight = eSprite.getHeight();
+                int eDrawWidth = (int) ((double) spriteSize / eNaturalHeight * eNaturalWidth);
+                int eDrawX = x + spriteSize - eDrawWidth;
+                g2.drawImage(eSprite, eDrawX, y + verticalSpacing * 4, eDrawWidth, spriteSize, null);
+                String eText = "Interact";
+                textWidth = fm.stringWidth(eText);
+                g2.drawString(eText, eDrawX - textWidth - 10, y + verticalSpacing * 4 + spriteSize/2 + 5);
+
+                // Draw Space button hint
+                BufferedImage spaceSprite = ImageIO.read(new File(keyH.spacePressed ? "res/buttons/spacep.png" : "res/buttons/spaceo.png"));
+                int spaceNaturalWidth = spaceSprite.getWidth();
+                int spaceNaturalHeight = spaceSprite.getHeight();
+                int spaceDrawWidth = (int) ((double) spriteSize / spaceNaturalHeight * spaceNaturalWidth);
+                int spaceDrawX = x + spriteSize - spaceDrawWidth;
+                g2.drawImage(spaceSprite, spaceDrawX, y + verticalSpacing * 5, spaceDrawWidth, spriteSize, null);
+                String spaceText = "Attack";
+                textWidth = fm.stringWidth(spaceText);
+                g2.drawString(spaceText, spaceDrawX - textWidth - 10, y + verticalSpacing * 5 + spriteSize/2 + 5);
+
+                // Draw Shift button hint
+                BufferedImage shiftSprite = ImageIO.read(new File(keyH.shiftPressed ? "res/buttons/shiftp.png" : "res/buttons/shifto.png"));
+                int shiftNaturalWidth = shiftSprite.getWidth();
+                int shiftNaturalHeight = shiftSprite.getHeight();
+                int shiftDrawWidth = (int) ((double) spriteSize / shiftNaturalHeight * shiftNaturalWidth);
+                int shiftDrawX = x + spriteSize - shiftDrawWidth;
+                g2.drawImage(shiftSprite, shiftDrawX, y + verticalSpacing * 6, shiftDrawWidth, spriteSize, null);
+                String shiftText = "Run";
+                textWidth = fm.stringWidth(shiftText);
+                g2.drawString(shiftText, shiftDrawX - textWidth - 10, y + verticalSpacing * 6 + spriteSize/2 + 5);
 
                 // Reset composite
                 g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));

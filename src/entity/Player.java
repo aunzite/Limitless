@@ -51,6 +51,17 @@ public final class Player extends Entity{
         lastCollisionTiles.add(new int[]{col, row});
     }
 
+    // Slash animation fields
+    private BufferedImage[][][] slashSheets = new BufferedImage[1][][]; // [sheet][row][col]
+    private int currentSlash = 0;
+    private boolean isSlashing = false;
+    private long lastSlashTime = 0;
+    private static final long SLASH_COOLDOWN = 500; // 500ms cooldown between slashes
+    private static final long SLASH_FRAME_DURATION = 50; // 50ms per frame
+    private long lastFrameTime = 0;
+    private int currentFrame = 0;
+    private int totalFrames = 24; // Total frames in slash3.png (6 columns × 4 rows)
+
     // Constructor initializes player with game panel and keyboard handler
     public Player (GamePanel gp, KeyHandler keyH){
         this.gp = gp;
@@ -243,16 +254,110 @@ public final class Player extends Entity{
             left10 = runLeft[0]; left11 = runLeft[1]; left12 = runLeft[2]; left13 = runLeft[3]; left14 = runLeft[4]; left15 = runLeft[5]; left16 = runLeft[6]; left17 = runLeft[7];
             down10 = runDown[0]; down11 = runDown[1]; down12 = runDown[2]; down13 = runDown[3]; down14 = runDown[4]; down15 = runDown[5]; down16 = runDown[6]; down17 = runDown[7];
             right10 = runRight[0]; right11 = runRight[1]; right12 = runRight[2]; right13 = runRight[3]; right14 = runRight[4]; right15 = runRight[5]; right16 = runRight[6]; right17 = runRight[7];
+
+            // Load slash sheets if withSword
+            if (baseDir.contains("withSword")) {
+                // slash3.png: 6x4
+                slashSheets[0] = loadSlashSheet(baseDir + "slash3.png", 6, 4);
+            } else {
+                slashSheets[0] = null;
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
+    private BufferedImage[][] loadSlashSheet(String path, int cols, int rows) {
+        System.out.println("Loading slash sheet from: " + path);
+        try {
+            File file = new File(path);
+            System.out.println("File exists: " + file.exists());
+            System.out.println("File path: " + file.getAbsolutePath());
+            
+            BufferedImage sheet = ImageIO.read(file);
+            System.out.println("Sheet loaded: " + (sheet != null));
+            if (sheet == null) {
+                System.err.println("Failed to load sheet: " + path);
+                return null;
+            }
+            
+            System.out.println("Sheet dimensions: " + sheet.getWidth() + "x" + sheet.getHeight());
+            BufferedImage[][] frames = new BufferedImage[rows][cols];
+            
+            // Common frame dimensions for all slash animations
+            int frameW = 128, frameH = 128;
+            
+            // Calculate total expected dimensions
+            int expectedWidth = cols * frameW;
+            int expectedHeight = rows * frameH;
+            
+            System.out.println("Expected dimensions: " + expectedWidth + "x" + expectedHeight);
+            System.out.println("Actual dimensions: " + sheet.getWidth() + "x" + sheet.getHeight());
+            
+            // Check if sheet is wide enough for all columns
+            if (sheet.getWidth() < expectedWidth) {
+                System.err.println("Sheet width too small for expected frames");
+                return null;
+            }
+            
+            // Check if sheet is tall enough for all rows
+            if (sheet.getHeight() < expectedHeight) {
+                System.err.println("Sheet height too small for expected frames");
+                return null;
+            }
+            
+            // Load frames
+            for (int y = 0; y < rows; y++) {
+                for (int x = 0; x < cols; x++) {
+                    try {
+                        int left = x * frameW;
+                        int top = y * frameH;
+                        frames[y][x] = sheet.getSubimage(left, top, frameW, frameH);
+                        System.out.println("Loaded frame at " + x + "," + y);
+                    } catch (Exception e) {
+                        System.err.println("Error loading frame at " + x + "," + y + ": " + e.getMessage());
+                        return null;
+                    }
+                }
+            }
+            
+            System.out.println("Successfully created frames array");
+            return frames;
+        } catch (Exception e) {
+            System.err.println("Error in loadSlashSheet: " + e.getMessage());
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public void setSwordTextures(boolean hasSword) {
+        System.out.println("Setting sword textures. hasSword: " + hasSword);
         if (hasSword) {
+            System.out.println("Loading withSword textures...");
             getPlayerImageFromDir("res/player/withSword/");
+            // Ensure slash animations are loaded
+            try {
+                // Try loading with absolute paths
+                String basePath = new File("").getAbsolutePath();
+                System.out.println("Base path: " + basePath);
+                
+                System.out.println("Attempting to load slash3.png...");
+                String slash3Path = basePath + "/res/player/withSword/slash3.png";
+                System.out.println("Full path: " + slash3Path);
+                // slash3.png is 768x512, with 6 columns and 4 rows
+                slashSheets[0] = loadSlashSheet(slash3Path, 6, 4);
+                System.out.println("slash3.png loaded: " + (slashSheets[0] != null));
+                
+                System.out.println("Slash animation loaded successfully");
+            } catch (Exception e) {
+                System.err.println("Error loading slash animation: " + e.getMessage());
+                e.printStackTrace();
+            }
         } else {
+            System.out.println("Loading default textures...");
             getPlayerImageFromDir("res/player/");
+            // Clear slash animation
+            slashSheets[0] = null;
         }
     }
     
@@ -356,115 +461,157 @@ public final class Player extends Entity{
         // Update HUD
         String weaponName = weapon != null ? weapon.getName() : "No Weapon";
         gp.hud.update(hp, stamina, weaponName, isMoving);
+
+        // Update slash animation
+        if (isSlashing) {
+            long currentTime = System.currentTimeMillis();
+            if (currentTime - lastFrameTime >= SLASH_FRAME_DURATION) {
+                currentFrame++;
+                lastFrameTime = currentTime;
+                
+                // Stop after playing through all frames once
+                if (currentFrame >= 6) { // Only play through one row (6 frames)
+                    isSlashing = false;
+                    currentFrame = 0;
+                }
+            }
+        }
     }
-    
-    // Draws the player with current sprite based on direction and animation frame
-    public void draw(Graphics2D g2){
+
+    public void draw(Graphics2D g2) {
         // Draw inventory overlay if open
         if (inventory.isOpen()) {
-            // Draw 50% opacity black rectangle over everything
             g2.setColor(new java.awt.Color(0, 0, 0, 128));
             g2.fillRect(0, 0, gp.screenWidth, gp.screenHeight);
-            // Draw inventory and items on top
             inventory.draw(g2);
-            // Always draw HUD on top of inventory
             String weaponName = weapon != null ? weapon.getName() : "No Weapon";
             gp.hud.update(hp, stamina, weaponName, false);
             gp.hud.draw(g2, weapon);
-            return; // Don't draw player or anything else
+            return;
         }
 
-        // Draw player sprite
         BufferedImage image = null;
-        switch (animationState) {
-            case "idle":
-                // Only 2 frames per direction for idle
-                if (direction.equals("up")) {
-                    image = (spriteNum == 2) ? up2 : up1;
-                } else if (direction.equals("down")) {
-                    image = (spriteNum == 2) ? down2 : down1;
-                } else if (direction.equals("left")) {
-                    image = (spriteNum == 2) ? left2 : left1;
-                } else if (direction.equals("right")) {
-                    image = (spriteNum == 2) ? right2 : right1;
-                }
-                break;
-            case "walk":
-                switch(direction){
-                    case "up":
-                        image = (spriteNum == 5) ? up5 : (spriteNum == 6) ? up6 : (spriteNum == 7) ? up7 : (spriteNum == 8) ? up8 : up9;
-                        break;
-                    case "down":
-                        image = (spriteNum == 5) ? down5 : (spriteNum == 6) ? down6 : (spriteNum == 7) ? down7 : (spriteNum == 8) ? down8 : down9;
-                        break;
-                    case "left":
-                        image = (spriteNum == 5) ? left5 : (spriteNum == 6) ? left6 : (spriteNum == 7) ? left7 : (spriteNum == 8) ? left8 : left9;
-                        break;
-                    case "right":
-                        image = (spriteNum == 5) ? right5 : (spriteNum == 6) ? right6 : (spriteNum == 7) ? right7 : (spriteNum == 8) ? right8 : right9;
-                        break;
-                }
-                break;
-            case "run":
-                // 8 frames per direction for run (10-17)
-                switch(direction){
-                    case "up":
-                        switch(spriteNum) {
-                            case 10: image = up10; break;
-                            case 11: image = up11; break;
-                            case 12: image = up12; break;
-                            case 13: image = up13; break;
-                            case 14: image = up14; break;
-                            case 15: image = up15; break;
-                            case 16: image = up16; break;
-                            case 17: image = up17; break;
-                        }
-                        break;
-                    case "down":
-                        switch(spriteNum) {
-                            case 10: image = down10; break;
-                            case 11: image = down11; break;
-                            case 12: image = down12; break;
-                            case 13: image = down13; break;
-                            case 14: image = down14; break;
-                            case 15: image = down15; break;
-                            case 16: image = down16; break;
-                            case 17: image = down17; break;
-                        }
-                        break;
-                    case "left":
-                        switch(spriteNum) {
-                            case 10: image = left10; break;
-                            case 11: image = left11; break;
-                            case 12: image = left12; break;
-                            case 13: image = left13; break;
-                            case 14: image = left14; break;
-                            case 15: image = left15; break;
-                            case 16: image = left16; break;
-                            case 17: image = left17; break;
-                        }
-                        break;
-                    case "right":
-                        switch(spriteNum) {
-                            case 10: image = right10; break;
-                            case 11: image = right11; break;
-                            case 12: image = right12; break;
-                            case 13: image = right13; break;
-                            case 14: image = right14; break;
-                            case 15: image = right15; break;
-                            case 16: image = right16; break;
-                            case 17: image = right17; break;
-                        }
-                        break;
-                }
-                break;
+        int drawX = worldX - gp.player.worldX + gp.player.screenX;
+        int drawY = worldY - gp.player.worldY + gp.player.screenY;
+
+        // Draw slash animation if active
+        if (isSlashing && slashSheets[0] != null) {
+            int row = 0;
+            switch (direction) {
+                case "up": row = 0; break;
+                case "left": row = 1; break;
+                case "down": row = 2; break;
+                case "right": row = 3; break;
+            }
+            int col = currentFrame % 6; // 6 columns in slash3.png
+            image = slashSheets[0][row][col];
+            if (image != null) {
+                double scale = 2.6; // Double the scale for slash animations
+                int drawWidth = (int)(gp.tileSize * scale);
+                int drawHeight = (int)(gp.tileSize * scale);
+                drawX = screenX - drawWidth / 2 + gp.tileSize / 2;
+                drawY = screenY - drawHeight + gp.tileSize + gp.tileSize / 2 + 15; // Move slash animation down by 15 pixels total
+                g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
+            }
+        } else {
+            // Draw normal player sprite
+            switch (direction) {
+                case "up":
+                    if (spriteNum == 1) image = up1;
+                    if (spriteNum == 2) image = up2;
+                    if (spriteNum == 3) image = up3;
+                    if (spriteNum == 4) image = up4;
+                    if (spriteNum == 5) image = up5;
+                    if (spriteNum == 6) image = up6;
+                    if (spriteNum == 7) image = up7;
+                    if (spriteNum == 8) image = up8;
+                    if (spriteNum == 9) image = up9;
+                    if (spriteNum == 10) image = up10;
+                    if (spriteNum == 11) image = up11;
+                    if (spriteNum == 12) image = up12;
+                    if (spriteNum == 13) image = up13;
+                    if (spriteNum == 14) image = up14;
+                    if (spriteNum == 15) image = up15;
+                    if (spriteNum == 16) image = up16;
+                    if (spriteNum == 17) image = up17;
+                    break;
+                case "down":
+                    if (spriteNum == 1) image = down1;
+                    if (spriteNum == 2) image = down2;
+                    if (spriteNum == 3) image = down3;
+                    if (spriteNum == 4) image = down4;
+                    if (spriteNum == 5) image = down5;
+                    if (spriteNum == 6) image = down6;
+                    if (spriteNum == 7) image = down7;
+                    if (spriteNum == 8) image = down8;
+                    if (spriteNum == 9) image = down9;
+                    if (spriteNum == 10) image = down10;
+                    if (spriteNum == 11) image = down11;
+                    if (spriteNum == 12) image = down12;
+                    if (spriteNum == 13) image = down13;
+                    if (spriteNum == 14) image = down14;
+                    if (spriteNum == 15) image = down15;
+                    if (spriteNum == 16) image = down16;
+                    if (spriteNum == 17) image = down17;
+                    break;
+                case "left":
+                    if (spriteNum == 1) image = left1;
+                    if (spriteNum == 2) image = left2;
+                    if (spriteNum == 3) image = left3;
+                    if (spriteNum == 4) image = left4;
+                    if (spriteNum == 5) image = left5;
+                    if (spriteNum == 6) image = left6;
+                    if (spriteNum == 7) image = left7;
+                    if (spriteNum == 8) image = left8;
+                    if (spriteNum == 9) image = left9;
+                    if (spriteNum == 10) image = left10;
+                    if (spriteNum == 11) image = left11;
+                    if (spriteNum == 12) image = left12;
+                    if (spriteNum == 13) image = left13;
+                    if (spriteNum == 14) image = left14;
+                    if (spriteNum == 15) image = left15;
+                    if (spriteNum == 16) image = left16;
+                    if (spriteNum == 17) image = left17;
+                    break;
+                case "right":
+                    if (spriteNum == 1) image = right1;
+                    if (spriteNum == 2) image = right2;
+                    if (spriteNum == 3) image = right3;
+                    if (spriteNum == 4) image = right4;
+                    if (spriteNum == 5) image = right5;
+                    if (spriteNum == 6) image = right6;
+                    if (spriteNum == 7) image = right7;
+                    if (spriteNum == 8) image = right8;
+                    if (spriteNum == 9) image = right9;
+                    if (spriteNum == 10) image = right10;
+                    if (spriteNum == 11) image = right11;
+                    if (spriteNum == 12) image = right12;
+                    if (spriteNum == 13) image = right13;
+                    if (spriteNum == 14) image = right14;
+                    if (spriteNum == 15) image = right15;
+                    if (spriteNum == 16) image = right16;
+                    if (spriteNum == 17) image = right17;
+                    break;
+            }
+            double scale = 1.3; // Normal scale for player
+            int drawWidth = (int)(gp.tileSize * scale);
+            int drawHeight = (int)(gp.tileSize * scale);
+            drawX = screenX - drawWidth / 2 + gp.tileSize / 2;
+            drawY = screenY - drawHeight + gp.tileSize;
+            g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
         }
-        // Draw the player sprite at 1.3x the tile size, feet aligned
-        double scale = 1.3;
-        int drawWidth = (int)(gp.tileSize * scale);
-        int drawHeight = (int)(gp.tileSize * scale);
-        int drawX = screenX - drawWidth / 2 + gp.tileSize / 2;
-        int drawY = screenY - drawHeight + gp.tileSize;
-        g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
+    }
+
+    public void triggerSlash() {
+        isSlashing = true;
+        currentFrame = 0;
+        lastFrameTime = System.currentTimeMillis();
+        lastSlashTime = System.currentTimeMillis();
+    }
+
+    public void handleSpacePressed() {
+        if (!isSlashing && System.currentTimeMillis() - lastSlashTime >= SLASH_COOLDOWN) {
+            triggerSlash();
+        }
     }
 }

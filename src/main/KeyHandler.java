@@ -22,6 +22,7 @@ public class KeyHandler implements KeyListener {
 
     private Saver saver;
     private HUD hud;
+    private GamePanel gp;
 
     // Movement & input tracking 
     public boolean shiftPressed;     // Sprint modifier key state
@@ -39,6 +40,7 @@ public class KeyHandler implements KeyListener {
     public boolean loadPressed;    // F6 key for loading
     public boolean deletePressed;  // F7 key for deleting save
     public boolean iPressed;       // I key for inventory
+    public boolean spacePressed;   // Space key for attack
 
     public KeyHandler(Saver saver, HUD hud) {
         this.saver = saver;
@@ -47,6 +49,10 @@ public class KeyHandler implements KeyListener {
 
     public void setHUD(HUD hud) {
         this.hud = hud;
+    }
+
+    public void setGamePanel(GamePanel gp) {
+        this.gp = gp;
     }
 
     @Override
@@ -76,6 +82,7 @@ public class KeyHandler implements KeyListener {
             case KeyEvent.VK_F7 -> deletePressed = true;
             case KeyEvent.VK_H -> hud.setShowAttackHistory(!hud.isShowAttackHistory()); //Attack history (Ahmed)
             case KeyEvent.VK_I -> iPressed = true;         // Inventory toggle
+            case KeyEvent.VK_SPACE -> { spacePressed = true; if (gp != null && gp.player != null) gp.player.handleSpacePressed(); }
         }
         saver.handleInput(savePressed, loadPressed, deletePressed);
     }
@@ -99,6 +106,7 @@ public class KeyHandler implements KeyListener {
             case KeyEvent.VK_F6 -> loadPressed = false;
             case KeyEvent.VK_F7 -> deletePressed = false; 
             case KeyEvent.VK_I -> iPressed = false;        // Inventory toggle released
+            case KeyEvent.VK_SPACE -> spacePressed = false;
         }
         saver.handleInput(savePressed, loadPressed, deletePressed);
     }

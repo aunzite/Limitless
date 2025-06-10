@@ -6,6 +6,11 @@ import java.awt.Graphics2D;
 import java.awt.BasicStroke;
 import java.awt.AlphaComposite;
 import main.KeyHandler;
+import main.GamePanel;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class HUD {
 
@@ -42,9 +47,11 @@ public class HUD {
     private static final float FADE_SPEED = 0.02f;
 
     private KeyHandler keyH;  // Add KeyHandler reference
+    private GamePanel gp;     // Add GamePanel reference
 
     // Constructor
-    public HUD(KeyHandler keyH) {
+    public HUD(GamePanel gp, KeyHandler keyH) {
+        this.gp = gp;
         this.keyH = keyH;
         playerHealth = 100;
         playerStamina = MAX_STAMINA;  // Start with full stamina
@@ -94,6 +101,14 @@ public class HUD {
         if (showAttackHistory && weapon != null) {
             drawAttackHistory(g2, weapon);
         }
+        
+        // Draw control hints
+        g2.setFont(new Font("Arial", Font.PLAIN, 16));
+        g2.setColor(new Color(255, 255, 255, (int)(controlHintsAlpha * 255)));
+        // Removed control hints for WASD, Shift, and Space
+        
+        // Draw inventory open/close hint
+        // Removed inventory open/close hint drawing code for io.png and ip.png
         
         // Restore original settings
         g2.setComposite(originalComposite);
