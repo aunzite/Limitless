@@ -1,3 +1,14 @@
+/////////////////////////////////////////////////////////////////////////////
+// Limitless
+// GifImage.java
+// 
+// Description: Handles GIF image loading and animation including:
+// - Frame loading and management
+// - Animation timing
+// - Frame rendering
+// - Resource cleanup
+/////////////////////////////////////////////////////////////////////////////
+
 package main;
 
 import javax.imageio.*;
@@ -13,13 +24,17 @@ import java.util.List;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+// Handles GIF image loading and animation
 public class GifImage {
-    private List<BufferedImage> frames;
-    private List<Integer> delays;
-    private long lastFrameTime;
-    private int currentFrame;
-    private int width;
-    private int height;
+    // Animation state
+    private List<BufferedImage> frames;          // Array of animation frames
+    private List<Integer> delays;                // Delay between frames in milliseconds
+    private long lastFrameTime;      // Last frame update time
+    private int currentFrame = 0;    // Current frame index
+    
+    // Image properties
+    private int width;               // Image width
+    private int height;              // Image height
     
     public GifImage(String path) {
         frames = new ArrayList<>();
@@ -47,7 +62,6 @@ public class GifImage {
             reader.setInput(input);
             
             int numFrames = reader.getNumImages(true);
-            BufferedImage master = null;
             width = -1;
             height = -1;
             
@@ -57,69 +71,12 @@ public class GifImage {
                 int delay = getDelayFromMetadata(metadata);
                 delays.add(delay);
                 
-                // Get frame position (x, y)
-                int x = 0, y = 0;
-                try {
-                    String[] names = metadata.getMetadataFormatNames();
-                    for (String name : names) {
-                        if (name.equals("javax_imageio_gif_image_1.0")) {
-                            Node root = metadata.getAsTree(name);
-                            NodeList children = root.getChildNodes();
-                            for (int j = 0; j < children.getLength(); j++) {
-                                Node node = children.item(j);
-                                if (node.getNodeName().equals("ImageDescriptor")) {
-                                    x = Integer.parseInt(node.getAttributes().getNamedItem("imageLeftPosition").getNodeValue());
-                                    y = Integer.parseInt(node.getAttributes().getNamedItem("imageTopPosition").getNodeValue());
-                                }
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    // Ignore, use default (0,0)
-                }
-                
                 if (width == -1 || height == -1) {
                     width = image.getWidth();
                     height = image.getHeight();
-                    master = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
                 }
                 
-                // Compose onto master
-                Graphics2D g2 = master.createGraphics();
-                g2.drawImage(image, x, y, null);
-                g2.dispose();
-                
-                // Copy the composed image for this frame
-                BufferedImage copy = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-                Graphics2D g2copy = copy.createGraphics();
-                g2copy.drawImage(master, 0, 0, null);
-                g2copy.dispose();
-                frames.add(copy);
-                
-                // Handle disposal method (restore to background)
-                try {
-                    String[] names = metadata.getMetadataFormatNames();
-                    for (String name : names) {
-                        if (name.equals("javax_imageio_gif_image_1.0")) {
-                            Node root = metadata.getAsTree(name);
-                            NodeList children = root.getChildNodes();
-                            for (int j = 0; j < children.getLength(); j++) {
-                                Node node = children.item(j);
-                                if (node.getNodeName().equals("GraphicControlExtension")) {
-                                    String disposal = node.getAttributes().getNamedItem("disposalMethod").getNodeValue();
-                                    if (disposal.equals("restoreToBackgroundColor")) {
-                                        Graphics2D g2clear = master.createGraphics();
-                                        g2clear.setComposite(java.awt.AlphaComposite.Clear);
-                                        g2clear.fillRect(x, y, image.getWidth(), image.getHeight());
-                                        g2clear.dispose();
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } catch (Exception e) {
-                    // Ignore
-                }
+                frames.add(image);
             }
             
             reader.dispose();

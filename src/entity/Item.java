@@ -19,8 +19,12 @@ public class Item {
     public Item(String name, String imagePath, int quantity) {
         this.name = name;
         this.quantity = quantity;
+        loadImage(imagePath);
+    }
+
+    private void loadImage(String path) {
         try {
-            this.image = ImageIO.read(new File(imagePath));
+            image = ImageIO.read(new File(path));
         } catch (Exception e) {
             System.err.println("Error loading item image: " + e.getMessage());
         }

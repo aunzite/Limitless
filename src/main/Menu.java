@@ -9,7 +9,6 @@ import java.awt.image.BufferedImage;
 
 public class Menu implements MouseListener, MouseMotionListener {
     private GamePanel gp;
-    private int selectedOption = 0;
     private final String[] options = {"Play", "Options", "Quit"};
     private Font titleFont = new Font("Comic Sans MS", Font.BOLD, 72);
     private Font menuFont = new Font("Comic Sans MS", Font.PLAIN, 36);
@@ -19,7 +18,6 @@ public class Menu implements MouseListener, MouseMotionListener {
     private static final float SCALE_SPEED = 0.1f;
     private static final float MAX_SCALE = 1.2f;
     private GifImage backgroundGif;
-    private GameSettings settings;
     private BufferedImage frameBuffer;
     private int frameWidth;
     private int frameHeight;
@@ -27,7 +25,6 @@ public class Menu implements MouseListener, MouseMotionListener {
     
     public Menu(GamePanel gp) {
         this.gp = gp;
-        this.settings = GameSettings.getInstance();
         this.audioManager = AudioManager.getInstance();
         
         // Initialize fonts
@@ -80,15 +77,15 @@ public class Menu implements MouseListener, MouseMotionListener {
         
         // Keyboard navigation
         if (gp.keyH.upPressed) {
-            selectedOption = (selectedOption - 1 + options.length) % options.length;
+            hoveredOption = (hoveredOption - 1 + options.length) % options.length;
             gp.keyH.upPressed = false;
         }
         if (gp.keyH.downPressed) {
-            selectedOption = (selectedOption + 1) % options.length;
+            hoveredOption = (hoveredOption + 1) % options.length;
             gp.keyH.downPressed = false;
         }
         if (gp.keyH.enterPressed) {
-            handleSelection(selectedOption);
+            handleSelection(hoveredOption);
             gp.keyH.enterPressed = false;
         }
     }

@@ -2,12 +2,11 @@
 // Limitless
 // Saver.java
 // 
-// Description: Manages game save/load functionality. This class:
-// - Handles saving game state to file (Aun)
-// - Manages loading saved game data (Aun)
-// - Controls player position persistence (Aun)
-// - Processes save/load/delete commands (Aun)
-// - Implements file I/O operations (Aun)
+// Description: Handles game save/load functionality including:
+// - Save game state
+// - Load game state
+// - Save file management
+// - Data serialization
 /////////////////////////////////////////////////////////////////////////////
 
 package main;
@@ -53,7 +52,6 @@ public class Saver {
     public void setDirection(String direction) { 
         this.direction = direction; 
     }
-
 
     // Saves current game state to file
     public void saveGame(int playerX, int playerY, String direction) {
@@ -131,7 +129,7 @@ public class Saver {
                     case "weapon":
                         String weaponName = br.readLine();
                         if (!weaponName.equals("null")) {
-                            gp.player.weapon = new Weapon(weaponName, 25, 1.0, "sword");
+                            gp.player.weapon = new Weapon(weaponName, 25, "sword");
                         } else {
                             gp.player.weapon = null;
                         }

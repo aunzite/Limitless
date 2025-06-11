@@ -1,3 +1,14 @@
+/////////////////////////////////////////////////////////////////////////////
+// Limitless
+// ConfirmationMessage.java
+// 
+// Description: Handles confirmation dialogs including:
+// - Save confirmation
+// - Load confirmation
+// - Quit confirmation
+// - Overwrite confirmation
+/////////////////////////////////////////////////////////////////////////////
+
 package main;
 
 import javax.swing.*;
@@ -15,6 +26,20 @@ public class ConfirmationMessage extends JWindow {
     private static final int FADE_DURATION = 300; // ms
     private static final int SHOW_DURATION = 1200; // ms
     private static final int FADE_INTERVAL = 30; // ms
+
+    // Dialog settings
+    private static final int WIDTH = 400;              // Dialog width
+    private static final int HEIGHT = 200;             // Dialog height
+    private static final int PADDING = 20;             // Dialog padding
+    
+    // Button settings
+    private static final int BUTTON_WIDTH = 100;       // Button width
+    private static final int BUTTON_HEIGHT = 30;       // Button height
+    private static final int BUTTON_SPACING = 20;      // Space between buttons
+    
+    // Text settings
+    private static final Font TITLE_FONT = new Font("Arial", Font.BOLD, 20);    // Title font
+    private static final Font MESSAGE_FONT = new Font("Arial", Font.PLAIN, 14); // Message font
 
     public ConfirmationMessage(String message) {
         this(message, null);

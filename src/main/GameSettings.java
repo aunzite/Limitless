@@ -1,20 +1,25 @@
+/////////////////////////////////////////////////////////////////////////////
+// Limitless
+// GameSettings.java
+// 
+// Description: Manages game settings including:
+// - Auto-save settings
+// - Key bindings
+// - Game preferences
+/////////////////////////////////////////////////////////////////////////////
+
 package main;
 
-import java.awt.Color;
-import java.awt.Composite;
-import java.awt.Graphics2D;
-import java.awt.AlphaComposite;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
+// Manages game settings and preferences
 public class GameSettings {
     private static final String SETTINGS_FILE = "settings.txt";
     private static GameSettings instance;
     
     // Settings
-    private float brightness = 1.0f;
-    private float contrast = 1.0f;
     private boolean autoSaveEnabled = true;
     private Map<String, Integer> keybinds;
     
@@ -41,16 +46,6 @@ public class GameSettings {
         keybinds.put("inventory", java.awt.event.KeyEvent.VK_I);
     }
     
-    public void setBrightness(float brightness) {
-        this.brightness = Math.max(0.0f, Math.min(2.0f, brightness));
-        saveSettings();
-    }
-    
-    public void setContrast(float contrast) {
-        this.contrast = Math.max(0.0f, Math.min(2.0f, contrast));
-        saveSettings();
-    }
-    
     public void setAutoSaveEnabled(boolean enabled) {
         this.autoSaveEnabled = enabled;
         saveSettings();
@@ -65,14 +60,6 @@ public class GameSettings {
         saveSettings();
     }
     
-    public float getBrightness() {
-        return brightness;
-    }
-    
-    public float getContrast() {
-        return contrast;
-    }
-    
     public int getKeybind(String action) {
         return keybinds.getOrDefault(action, 0);
     }
@@ -83,8 +70,6 @@ public class GameSettings {
     
     public void saveSettings() {
         try (PrintWriter writer = new PrintWriter(new FileWriter(SETTINGS_FILE))) {
-            writer.println("brightness=" + brightness);
-            writer.println("contrast=" + contrast);
             writer.println("autosave=" + autoSaveEnabled);
             for (Map.Entry<String, Integer> entry : keybinds.entrySet()) {
                 writer.println("keybind:" + entry.getKey() + "=" + entry.getValue());
@@ -111,11 +96,7 @@ public class GameSettings {
                 String value = parts[1];
                 
                 try {
-                    if (key.equals("brightness")) {
-                        brightness = Float.parseFloat(value);
-                    } else if (key.equals("contrast")) {
-                        contrast = Float.parseFloat(value);
-                    } else if (key.equals("autosave")) {
+                    if (key.equals("autosave")) {
                         autoSaveEnabled = Boolean.parseBoolean(value);
                     } else if (key.startsWith("keybind:")) {
                         String action = key.substring(8);
@@ -128,56 +109,5 @@ public class GameSettings {
         } catch (IOException e) {
             // Handle error silently
         }
-    }
-    
-    public Color adjustColor(Color color) {
-        float[] hsb = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
-        
-        // Adjust brightness
-        hsb[2] = Math.min(1.0f, hsb[2] * brightness);
-        
-        // Adjust contrast
-        hsb[2] = (hsb[2] - 0.5f) * contrast + 0.5f;
-        hsb[2] = Math.max(0.0f, Math.min(1.0f, hsb[2]));
-        
-        return Color.getHSBColor(hsb[0], hsb[1], hsb[2]);
-    }
-    
-    public void applySettings(Graphics2D g2) {
-        // Apply brightness and contrast to the graphics context
-        // This is a simple implementation - you might want to use more sophisticated
-        // image processing techniques for better results
-        float brightnessFactor = brightness - 1.0f;
-        float contrastFactor = contrast - 1.0f;
-        
-        // Create a composite that combines brightness and contrast
-        Composite originalComposite = g2.getComposite();
-        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1.0f));
-        
-        // Apply brightness
-        if (brightnessFactor != 0) {
-            g2.setColor(new Color(
-                (int)(brightnessFactor * 255),
-                (int)(brightnessFactor * 255),
-                (int)(brightnessFactor * 255),
-                (int)(Math.abs(brightnessFactor) * 255)
-            ));
-            g2.fillRect(0, 0, g2.getDeviceConfiguration().getBounds().width,
-                       g2.getDeviceConfiguration().getBounds().height);
-        }
-        
-        // Apply contrast
-        if (contrastFactor != 0) {
-            g2.setColor(new Color(
-                (int)(contrastFactor * 255),
-                (int)(contrastFactor * 255),
-                (int)(contrastFactor * 255),
-                (int)(Math.abs(contrastFactor) * 255)
-            ));
-            g2.fillRect(0, 0, g2.getDeviceConfiguration().getBounds().width,
-                       g2.getDeviceConfiguration().getBounds().height);
-        }
-        
-        g2.setComposite(originalComposite);
     }
 } 

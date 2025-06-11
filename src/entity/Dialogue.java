@@ -1,5 +1,4 @@
 package entity;
-import java.util.ArrayList;
 
 /////////////////////////////////////////////////////////////////////////////
 // Limitless
@@ -14,46 +13,55 @@ import java.util.ArrayList;
 // - Returns dialogue text via toString 
 /////////////////////////////////////////////////////////////////////////////
 
+//imports
+import java.util.ArrayList;
+
 public class Dialogue {
 
-    // Attribute 
-    private String currentLine;  // Stores the current dialogue line to display
+    //variables
+    //current line
+    private String currentLine;
+
+    //history
     private ArrayList<String> history;
 
-    // Constructor 
-    // Initializes dialogue with an empty string
+    //constructor
     public Dialogue() {
+        //set current line to empty
         currentLine = "";
-        history =  new ArrayList<String>();
+        //create new history
+        history = new ArrayList<String>();
     }
 
-    // Accessor 
-    // Returns the current dialogue line
+    //getters
+
+    //get current line
     public String getLine() {
         return currentLine;
     }
 
-    // Accessor 
-    //Returns the history of Dialogue lines
-    public ArrayList<String> getHistory(){
+    //get history
+    public ArrayList<String> getHistory() {
         return history;
     }
 
-    // Mutator 
-    // Sets the current dialogue line to a new message
+    //setters
+
+    //set current line
     public void setLine(String line) {
+        //set current line
         currentLine = line;
+        //add line to history
         history.add(line);
     }
 
-    // Mutator
-    // Clears the current dialogue line
+    //clear current line
     public void clear() {
+        //set current line to empty
         currentLine = "";
     }
 
-    // toString method 
-    // Returns the current dialogue as a string
+    //get string
     public String toString() {
         return currentLine;
     }
