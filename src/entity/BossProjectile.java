@@ -81,4 +81,9 @@ public class BossProjectile {
     public Rectangle getBounds() {
         return new Rectangle((int)x, (int)y, width, height);
     }
+
+    // Returns true if the projectile is out of the screen bounds
+    public boolean isOutOfBounds() {
+        return x < 0 || y < 0 || x > 1920 || y > 1080;
+    }
 } 
