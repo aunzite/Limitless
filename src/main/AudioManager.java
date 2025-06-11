@@ -54,6 +54,14 @@ public class AudioManager {
                 gameOverMusic.open(audioIn);
             }
             
+            // Load boss fight music
+            File bossFightFile = new File("res/audio/battle_music.wav");
+            if (bossFightFile.exists()) {
+                AudioInputStream audioIn = AudioSystem.getAudioInputStream(bossFightFile);
+                bossFightMusic = AudioSystem.getClip();
+                bossFightMusic.open(audioIn);
+            }
+            
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             // Handle error silently
         }

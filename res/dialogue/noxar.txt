@@ -1,0 +1,38 @@
+[You enter the heart of Noxar’s dark fortress. Cracked stone. Moonlight through broken arches. Noxar stands still, facing away, cloak trailing.]
+
+Noxar:
+“So... you carry it.”
+
+[He slowly turns to face you. His crimson eyes glint, but not with rage — with satisfaction.]
+
+Noxar:
+“How poetic. After decades of hunting, burning villages, chasing ghosts... the blade walks itself into my hands.”
+
+[He begins to descend from his platform. Each step echoes.]
+
+Noxar:
+“Elaria thought she was clever. Escaping with Solthorn after I wiped out her bloodline. I nearly forgot her face—until I saw her eyes in yours.”
+
+Noxar:
+“Tell me… did she tell you what that sword truly is?”
+
+Noxar:
+“It’s not just a blade. The gem in its hilt is called Aurellight. Ancient. Divine. A shard of the sun itself, forged to imprison creatures like me.”
+
+[He gestures, and shadows swirl around his hands.]
+
+Noxar:
+“And with it... I become more than vampire. No more hiding in ruins. No more running from dawn. With that gem, I walk under sunlight and never burn.”
+
+Noxar:
+“Immortal. Unstoppable. Eternal.”
+
+[He spreads his arms wide, laughing softly.]
+
+Noxar:
+“So thank you, little hero. You’ve done what centuries of my loyal have failed to do.”
+
+[He steps into a battle stance. The room pulses with energy.]
+
+Noxar:
+“Now, hand it over… or I’ll tear it from your corpse.”
