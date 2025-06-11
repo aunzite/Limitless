@@ -1,0 +1,8 @@
+autosave=true
+keybind:left=65
+keybind:sprint=16
+keybind:interact=69
+keybind:up=87
+keybind:right=68
+keybind:inventory=73
+keybind:down=83
