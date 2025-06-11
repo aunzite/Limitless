@@ -2,12 +2,11 @@
 // Limitless
 // CollisionChecker.java
 // 
-// Description: Handles collision detection in the game. This class:
-// - Manages tile-based collision detection (Ajmal)
-// - Calculates entity hitbox positions (Ajmal)
-// - Processes directional collision checks (Ajmal)
-// - Updates entity collision states (Ajmal)
-// - Handles world boundary collision (Ajmal)
+// Description: Handles collision detection including:
+// - Tile collisions
+// - Object collisions
+// - Entity collisions
+// - Interaction boundaries
 /////////////////////////////////////////////////////////////////////////////
 package main;
 
@@ -17,6 +16,10 @@ public class CollisionChecker {
 
     GamePanel gp;
     
+    // Collision margins
+    private static final int MARGIN = 4;     // Collision margin in pixels
+    private static final int INTERACT_MARGIN = 48;  // Interaction radius
+
     public CollisionChecker(GamePanel gp) {
         this.gp = gp;
     }

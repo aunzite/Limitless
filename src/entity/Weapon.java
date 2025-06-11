@@ -6,15 +6,13 @@ public class Weapon {
     // Attributes
     private String name;       // Name of the weapon (e.g., "Steel Sword")
     private int damage;        // Damage value dealt to enemies
-    private double weight;     // Weight of the weapon for balance or stamina use
     private String type;       // Type of weapon (e.g., sword, axe, bow)
     private ArrayList<String> attackHistory; // Stores the attack log for this weapon
 
     // Constructor
-    public Weapon(String name, int damage, double weight, String type) {
+    public Weapon(String name, int damage, String type) {
         this.name = name;
         this.damage = damage;
-        this.weight = weight;
         this.type = type;
         this.attackHistory = new ArrayList<>();
     }
@@ -39,11 +37,6 @@ public class Weapon {
         return damage;
     }
 
-    // Get weapon weight
-    public double getWeight() {
-        return weight;
-    }
-
     // Get weapon type
     public String getType() {
         return type;
@@ -57,11 +50,6 @@ public class Weapon {
     // Set weapon damage
     public void setDamage(int damage) {
         this.damage = damage;
-    }
-
-    // Set weapon weight
-    public void setWeight(double weight) {
-        this.weight = weight;
     }
 
     // Set weapon type

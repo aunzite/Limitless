@@ -1,20 +1,23 @@
+/////////////////////////////////////////////////////////////////////////////
+// Limitless
+// OptionsMenu.java
+// 
+// Description: Handles the options menu including:
+// - Volume controls
+// - Graphics settings
+// - Controls configuration
+// - Game settings
+/////////////////////////////////////////////////////////////////////////////
+
 package main;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.awt.geom.AffineTransform;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
-import java.io.File;
-import java.io.IOException;
 
 public class OptionsMenu implements MouseListener, MouseMotionListener {
     private GamePanel gp;
     private GameSettings settings;
-    private int selectedOption = 0;
     private int hoveredOption = -1;
     private float[] optionScales;
     private static final float SCALE_SPEED = 0.1f;
@@ -24,7 +27,6 @@ public class OptionsMenu implements MouseListener, MouseMotionListener {
     // UI elements
     private Rectangle backButton;
     private Rectangle autoSaveToggle;
-    private BufferedImage backgroundImage;
     
     // Fonts
     private Font titleFont = new Font("Comic Sans MS", Font.BOLD, 72);

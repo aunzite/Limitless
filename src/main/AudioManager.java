@@ -1,20 +1,41 @@
+/////////////////////////////////////////////////////////////////////////////
+// Limitless
+// AudioManager.java
+// 
+// Description: Manages all game audio including:
+// - Background music
+// - Sound effects
+// - Volume control
+// - Audio state persistence
+/////////////////////////////////////////////////////////////////////////////
+
 package main;
 
 import java.io.File;
 import java.io.IOException;
 import javax.sound.sampled.*;
+import java.util.Map;
 
+// Singleton class that manages all game audio
 public class AudioManager {
+    // Singleton instance
     private static AudioManager instance;
+    
+    // Audio settings
+    private float musicVolume = 0.5f;
+    private boolean musicEnabled = true;
+    
+    // Audio clips
     private Clip mainMenuMusic;
     private Clip gameOverMusic;
     private Clip bossFightMusic;
-    private Clip area1Music;
-    private Clip area2Music;
-    private Clip area3Music;
     private Clip mainAreaMusic;  // New field for main area music
     private Clip currentMusic;
-    private float volume = 0.2f; // Default volume (0.0 to 1.0)
+    
+    // Audio file paths
+    private static final String MAIN_MENU_MUSIC = "res/audio/main_menu.wav";
+    private static final String BOSS_FIGHT_MUSIC = "res/audio/boss_fight.wav";
+    private static final String DEFEAT_MUSIC = "res/audio/defeat.wav";
     
     private AudioManager() {
         loadMusic();
@@ -30,7 +51,7 @@ public class AudioManager {
     private void loadMusic() {
         try {
             // Load main menu music
-            File mainMenuFile = new File("res/audio/main_menu.wav");
+            File mainMenuFile = new File(MAIN_MENU_MUSIC);
             if (mainMenuFile.exists()) {
                 AudioInputStream audioIn = AudioSystem.getAudioInputStream(mainMenuFile);
                 mainMenuMusic = AudioSystem.getClip();
@@ -47,7 +68,7 @@ public class AudioManager {
             
             // Load other music files as needed
             // Example for game over music:
-            File gameOverFile = new File("res/audio/game_over.wav");
+            File gameOverFile = new File(DEFEAT_MUSIC);
             if (gameOverFile.exists()) {
                 AudioInputStream audioIn = AudioSystem.getAudioInputStream(gameOverFile);
                 gameOverMusic = AudioSystem.getClip();
@@ -55,7 +76,7 @@ public class AudioManager {
             }
             
             // Load boss fight music
-            File bossFightFile = new File("res/audio/battle_music.wav");
+            File bossFightFile = new File(BOSS_FIGHT_MUSIC);
             if (bossFightFile.exists()) {
                 AudioInputStream audioIn = AudioSystem.getAudioInputStream(bossFightFile);
                 bossFightMusic = AudioSystem.getClip();
@@ -83,18 +104,6 @@ public class AudioManager {
         playMusic(bossFightMusic);
     }
     
-    public void playArea1Music() {
-        playMusic(area1Music);
-    }
-    
-    public void playArea2Music() {
-        playMusic(area2Music);
-    }
-    
-    public void playArea3Music() {
-        playMusic(area3Music);
-    }
-    
     private void playMusic(Clip clip) {
         if (clip == null) {
             return;
@@ -113,7 +122,7 @@ public class AudioManager {
             
             // Set volume
             FloatControl gainControl = (FloatControl) clip.getControl(FloatControl.Type.MASTER_GAIN);
-            float dB = (float) (Math.log(volume) / Math.log(10.0) * 20.0);
+            float dB = (float) (Math.log(musicVolume) / Math.log(10.0) * 20.0);
             gainControl.setValue(dB);
             
         } catch (Exception e) {
@@ -128,16 +137,17 @@ public class AudioManager {
         }
     }
     
-    public void setVolume(float volume) {
-        this.volume = Math.max(0.0f, Math.min(1.0f, volume));
+    public void setMusicVolume(float volume) {
+        this.musicVolume = Math.max(0.0f, Math.min(1.0f, volume));
         if (currentMusic != null) {
             FloatControl gainControl = (FloatControl) currentMusic.getControl(FloatControl.Type.MASTER_GAIN);
-            float dB = (float) (Math.log(volume) / Math.log(10.0) * 20.0);
+            float dB = (float) (Math.log(musicVolume) / Math.log(10.0) * 20.0);
             gainControl.setValue(dB);
         }
     }
     
-    public float getVolume() {
-        return volume;
+    public float getMusicVolume() {
+        return musicVolume;
     }
+    
 } 

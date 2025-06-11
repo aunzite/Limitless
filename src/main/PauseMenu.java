@@ -1,3 +1,14 @@
+/////////////////////////////////////////////////////////////////////////////
+// Limitless
+// PauseMenu.java
+// 
+// Description: Handles the pause menu including:
+// - Resume game
+// - Options menu
+// - Save/Load
+// - Return to main menu
+/////////////////////////////////////////////////////////////////////////////
+
 package main;
 
 import java.awt.*;
@@ -7,9 +18,19 @@ import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 
 public class PauseMenu implements MouseListener, MouseMotionListener {
+    // Game panel reference
     private GamePanel gp;
-    private int selectedOption = 0;
-    private final String[] options = {"Resume", "Main Menu", "Quit"};
+    
+    // Menu options
+    private static final String[] OPTIONS = {
+        "Resume",
+        "Options",
+        "Save Game",
+        "Load Game",
+        "Return to Main Menu"
+    };
+    
+    // Menu layout
     private Font titleFont = new Font("Comic Sans MS", Font.BOLD, 72);
     private Font menuFont = new Font("Comic Sans MS", Font.PLAIN, 36);
     private Rectangle[] optionBounds;
@@ -28,9 +49,9 @@ public class PauseMenu implements MouseListener, MouseMotionListener {
         menuFont = new Font("Comic Sans MS", Font.PLAIN, 36);
         
         // Initialize menu options
-        optionBounds = new Rectangle[options.length];
-        optionScales = new float[options.length];
-        for (int i = 0; i < options.length; i++) {
+        optionBounds = new Rectangle[OPTIONS.length];
+        optionScales = new float[OPTIONS.length];
+        for (int i = 0; i < OPTIONS.length; i++) {
             optionScales[i] = 1.0f;
             // Initialize option bounds with default values
             optionBounds[i] = new Rectangle(0, 0, 0, 0);
@@ -43,7 +64,7 @@ public class PauseMenu implements MouseListener, MouseMotionListener {
     
     public void update() {
         // Update scales for hover effect
-        for (int i = 0; i < options.length; i++) {
+        for (int i = 0; i < OPTIONS.length; i++) {
             if (i == hoveredOption) {
                 optionScales[i] = Math.min(MAX_SCALE, optionScales[i] + SCALE_SPEED);
             } else {
@@ -53,15 +74,15 @@ public class PauseMenu implements MouseListener, MouseMotionListener {
         
         // Keyboard navigation
         if (gp.keyH.upPressed) {
-            selectedOption = (selectedOption - 1 + options.length) % options.length;
+            hoveredOption = (hoveredOption - 1 + OPTIONS.length) % OPTIONS.length;
             gp.keyH.upPressed = false;
         }
         if (gp.keyH.downPressed) {
-            selectedOption = (selectedOption + 1) % options.length;
+            hoveredOption = (hoveredOption + 1) % OPTIONS.length;
             gp.keyH.downPressed = false;
         }
         if (gp.keyH.enterPressed) {
-            handleSelection(selectedOption);
+            handleSelection(hoveredOption);
             gp.keyH.enterPressed = false;
         }
         
@@ -77,13 +98,19 @@ public class PauseMenu implements MouseListener, MouseMotionListener {
             case 0: // Resume
                 gp.gameState = GamePanel.PLAY_STATE;
                 break;
-            case 1: // Main Menu
-                audioManager.stopMusic(); // Stop current music
-                audioManager.playMainMenuMusic(); // Play menu music
-                gp.gameState = GamePanel.MENU_STATE;
+            case 1: // Options
+                gp.gameState = GamePanel.OPTIONS_STATE;
                 break;
-            case 2: // Quit
-                System.exit(0);
+            case 2: // Save Game
+                gp.saver.saveGame(gp.player.worldX, gp.player.worldY, gp.player.direction);
+                break;
+            case 3: // Load Game
+                gp.saver.loadGame();
+                break;
+            case 4: // Return to Main Menu
+                audioManager.stopMusic();
+                audioManager.playMainMenuMusic();
+                gp.gameState = GamePanel.MENU_STATE;
                 break;
         }
     }
@@ -112,29 +139,29 @@ public class PauseMenu implements MouseListener, MouseMotionListener {
         int optionY = gp.screenHeight / 2;
         int optionSpacing = 60;
         
-        for (int i = 0; i < options.length; i++) {
+        for (int i = 0; i < OPTIONS.length; i++) {
             // Calculate option position
-            int optionX = (gp.screenWidth - fm.stringWidth(options[i])) / 2;
+            int optionX = (gp.screenWidth - fm.stringWidth(OPTIONS[i])) / 2;
             
             // Update option bounds for mouse interaction
             optionBounds[i] = new Rectangle(
                 optionX - 20,
                 optionY - fm.getHeight() + 5,
-                fm.stringWidth(options[i]) + 40,
+                fm.stringWidth(OPTIONS[i]) + 40,
                 fm.getHeight() + 10
             );
             
             // Apply scale transformation
             AffineTransform oldTransform = g2.getTransform();
-            g2.translate(optionX + fm.stringWidth(options[i]) / 2, optionY);
+            g2.translate(optionX + fm.stringWidth(OPTIONS[i]) / 2, optionY);
             g2.scale(optionScales[i], optionScales[i]);
-            g2.translate(-(optionX + fm.stringWidth(options[i]) / 2), -optionY);
+            g2.translate(-(optionX + fm.stringWidth(OPTIONS[i]) / 2), -optionY);
             
             // Draw option text with shadow
             g2.setColor(new Color(0, 0, 0, 150));
-            g2.drawString(options[i], optionX + 4, optionY + 4);
+            g2.drawString(OPTIONS[i], optionX + 4, optionY + 4);
             g2.setColor(Color.WHITE);
-            g2.drawString(options[i], optionX, optionY);
+            g2.drawString(OPTIONS[i], optionX, optionY);
             
             // Restore original transform
             g2.setTransform(oldTransform);
@@ -148,7 +175,7 @@ public class PauseMenu implements MouseListener, MouseMotionListener {
         if (gp.gameState != GamePanel.PAUSE_STATE) return;
         
         Point mousePoint = e.getPoint();
-        for (int i = 0; i < options.length; i++) {
+        for (int i = 0; i < OPTIONS.length; i++) {
             if (optionBounds[i].contains(mousePoint)) {
                 handleSelection(i);
                 break;
@@ -176,13 +203,13 @@ public class PauseMenu implements MouseListener, MouseMotionListener {
         if (gp.gameState != GamePanel.PAUSE_STATE) return;
         
         Point mousePoint = e.getPoint();
-        for (int i = 0; i < options.length; i++) {
+        hoveredOption = -1;
+        for (int i = 0; i < OPTIONS.length; i++) {
             if (optionBounds[i].contains(mousePoint)) {
                 hoveredOption = i;
-                return;
+                break;
             }
         }
-        hoveredOption = -1;
     }
     
     @Override

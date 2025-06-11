@@ -70,7 +70,7 @@ public final class Player extends Entity{
         hp = 100;
         stamina = 100;
         weapon = null; // Start with no weapon
-        inventory = new Inventory(gp); // Use new Inventory constructor
+        inventory = new Inventory(gp, 20); // Use new Inventory constructor
 
         // Calculate center position of screen for player
         screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
@@ -706,5 +706,22 @@ public final class Player extends Entity{
         drawX = screenX - drawWidth / 2 + gp.tileSize / 2;
         drawY = screenY - drawHeight + gp.tileSize;
         g2.drawImage(image, drawX, drawY, drawWidth, drawHeight, null);
+    }
+
+    // Equip weapon
+    public void equipWeapon(Weapon weapon) {
+        // Set weapon
+        this.weapon = weapon;
+    }
+
+    // Heal
+    public void heal(int amount) {
+        // Add amount to health
+        hp += amount;
+
+        // If health is greater than max health
+        if (hp > 100) {
+            hp = 100;
+        }
     }
 }
