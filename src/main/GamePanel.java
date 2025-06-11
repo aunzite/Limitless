@@ -399,7 +399,7 @@ public class GamePanel extends JPanel implements Runnable, MouseListener, MouseM
             projectile.update();
             
             // Remove projectiles that are out of bounds or have hit something
-            if (projectile.isOutOfBounds() || projectile.hasHit()) {
+            if (projectile.isOutOfBounds()) {
                 bossProjectiles.remove(i);
             }
         }
